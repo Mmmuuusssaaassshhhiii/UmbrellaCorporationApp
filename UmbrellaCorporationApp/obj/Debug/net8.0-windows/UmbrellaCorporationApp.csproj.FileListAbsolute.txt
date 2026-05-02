@@ -1,0 +1,14 @@
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\UmbrellaCorporationApp.exe
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\UmbrellaCorporationApp.deps.json
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\UmbrellaCorporationApp.runtimeconfig.json
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\UmbrellaCorporationApp.dll
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\UmbrellaCorporationApp.pdb
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.AssemblyInfoInputs.cache
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.AssemblyInfo.cs
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.csproj.CoreCompileInputs.cache
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.dll
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\refint\UmbrellaCorporationApp.dll
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.pdb
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.genruntimeconfig.cache
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\ref\UmbrellaCorporationApp.dll
