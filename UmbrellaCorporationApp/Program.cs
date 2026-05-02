@@ -1,16 +1,23 @@
-namespace UmbrellaCorporationApp;
+using Microsoft.EntityFrameworkCore;
+using UmbrellaCorp.Data;
 
-static class Program
+namespace UmbrellaCorporationApp
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
-    [STAThread]
-    static void Main()
+    internal static class Program
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
-        ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
+        [STAThread]
+        static void Main()
+        {
+            var connectionString = "server=localhost;port=8889;database=UmbrellaDb;user=root;password=root;";
+
+            var options = new DbContextOptionsBuilder<UmbrellaDbContext>()
+                .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                .Options;
+
+            var context = new UmbrellaDbContext(options);
+
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1(context));
+        }
     }
 }

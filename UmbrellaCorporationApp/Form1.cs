@@ -1,9 +1,26 @@
-namespace UmbrellaCorporationApp;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Windows.Forms;
+using UmbrellaCorp.Data;
 
-public partial class Form1 : Form
+namespace UmbrellaCorporationApp
 {
-    public Form1()
+    public partial class Form1 : Form
     {
-        InitializeComponent();
+        private readonly UmbrellaDbContext _context;
+
+        public Form1(UmbrellaDbContext context)
+        {
+            InitializeComponent();
+            _context = context;
+            this.Load += Form1_Load;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            var count = _context.Employees.Count();
+            MessageBox.Show($"Employees: {count}");
+        }
     }
 }
