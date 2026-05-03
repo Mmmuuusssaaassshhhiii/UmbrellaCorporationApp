@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
+using UmbrellaCorp.Models;
 
 namespace UmbrellaCorporationApp
 {
@@ -14,18 +14,6 @@ namespace UmbrellaCorporationApp
         {
             InitializeComponent();
             _context = context;
-            this.Load += AuthForm_Load;
-        }
-
-        private void AuthForm_Load(object sender, EventArgs e)
-        {
-            var count = _context.Employees.Count();
-            MessageBox.Show($"Employees: {count}");
-        }
-
-        private void AuthForm_Load_1(object sender, EventArgs e)
-        {
-            throw new System.NotImplementedException();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -40,7 +28,7 @@ namespace UmbrellaCorporationApp
             }
 
             var employee = _context.Employees
-                .FirstOrDefault(e => 
+                .FirstOrDefault(e =>
                     e.FullName.ToLower() == fullName.ToLower() &&
                     e.BadgeId == badgeId);
 
@@ -48,7 +36,7 @@ namespace UmbrellaCorporationApp
             {
                 MessageBox.Show($"Добро пожаловать, {employee.FullName}");
 
-                var mainForm = new MainScreen(_context);
+                var mainForm = new MainScreen(_context, employee); // ✅ исправлено
                 mainForm.Show();
                 this.Hide();
             }
@@ -56,16 +44,6 @@ namespace UmbrellaCorporationApp
             {
                 MessageBox.Show("Неверное имя или Badge ID");
             }
-        }
-
-        private void login_TextChanged(object sender, EventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        private void password_TextChanged(object sender, EventArgs e)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

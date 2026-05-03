@@ -64,7 +64,6 @@ partial class AuthForm
         password.Name = "password";
         password.Size = new System.Drawing.Size(400, 22);
         password.TabIndex = 1;
-        password.TextChanged += password_TextChanged;
         // 
         // login
         // 
@@ -72,7 +71,6 @@ partial class AuthForm
         login.Name = "login";
         login.Size = new System.Drawing.Size(400, 22);
         login.TabIndex = 0;
-        login.TextChanged += login_TextChanged;
         // 
         // AuthForm
         // 

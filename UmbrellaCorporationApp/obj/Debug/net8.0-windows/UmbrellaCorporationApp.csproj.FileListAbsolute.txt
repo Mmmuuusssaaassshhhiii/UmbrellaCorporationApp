@@ -119,3 +119,4 @@ D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debu
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\Umbrella.7CF0A3F3.Up2Date
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.AuthForm.resources
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.csproj.GenerateResource.cache
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.MainScreen.resources
