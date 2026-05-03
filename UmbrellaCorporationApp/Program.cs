@@ -17,7 +17,7 @@ namespace UmbrellaCorporationApp
             var context = new UmbrellaDbContext(options);
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1(context));
+            Application.Run(new AuthForm(context));
         }
     }
 }
