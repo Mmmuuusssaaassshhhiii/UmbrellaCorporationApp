@@ -14,9 +14,25 @@ namespace UmbrellaCorporationApp
         private Button? _activeButton;
         private Panel _activeIndicator;
 
-        private void LoadScreen(UserControl control)
+        private async void LoadScreen(UserControl control)
         {
+            control.Dock = DockStyle.None;
+            control.Width = content.Width;
+            control.Height = content.Height;
+            control.Left = content.Width;
+
+            content.Controls.Add(control);
+
+            // анимация въезда
+            while (control.Left > 0)
+            {
+                control.Left -= 40;
+                await Task.Delay(5);
+            }
+
+            // удаляем старые контролы
             content.Controls.Clear();
+            control.Dock = DockStyle.Fill;
             content.Controls.Add(control);
         }
 
@@ -33,6 +49,11 @@ namespace UmbrellaCorporationApp
             _activeButton = btn;
             btn.BackColor = Color.FromArgb(120, 0, 0);
             btn.ForeColor  = Color.White;
+            
+            _activeIndicator.Height = btn.Height;
+            _activeIndicator.Top = btn.Top;
+            _activeIndicator.Left = 0;
+            _activeIndicator.Visible = true;
         }
 
         private Panel header;
@@ -109,7 +130,7 @@ namespace UmbrellaCorporationApp
         Height = 40,
         TextAlign = ContentAlignment.MiddleLeft,
         Padding = new Padding(15, 0, 0, 0),
-        Font = new Font("Oxanium", 9, FontStyle.Bold)
+        Font = new Font("Exo 2", 10, FontStyle.Bold)
     };
     sidebar.Controls.Add(menuLabel);
 
@@ -123,47 +144,47 @@ namespace UmbrellaCorporationApp
     sidebar.Controls.Add(logo);
 
     // buttons
-    AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", () =>
+    AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ","UmbrellaCorporationApp/Source/Report.png", () =>
     {
         LoadScreen(new ReportsControl());
     });
-    AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", () =>
+    AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", "UmbrellaCorporationApp/Source/Virus.png", () =>
     {
         LoadScreen(new VirusControl());
     });
-    AddMenuButton("ИСПЫТУЕМЫЕ", () =>
+    AddMenuButton("ИСПЫТУЕМЫЕ", "UmbrellaCorporationApp/Source/Subject.png", () =>
     {
         LoadScreen(new SubjectsControl());
     });
-    AddMenuButton("СТАТИСТИКА", () =>
+    AddMenuButton("СТАТИСТИКА", "UmbrellaCorporationApp/Source/Statistic.png", () =>
     {
         LoadScreen(new StatisticsControl());
     });
-    AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", () =>
+    AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "UmbrellaCorporationApp/Source/Protocol.png", () =>
     {
         LoadScreen(new ProtocolsControl());
     });
-    AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", () =>
+    AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", "UmbrellaCorporationApp/Source/Document.png", () =>
     {
         LoadScreen(new FilesControl());
     });
-    AddMenuButton("СОТРУДНИКИ", () =>
+    AddMenuButton("СОТРУДНИКИ", "UmbrellaCorporationApp/Source/Report.png", () =>
     {
         LoadScreen(new EmployeesControl());
     });
-    AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", () =>
+    AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", "UmbrellaCorporationApp/Source/Log.png", () =>
     {
         LoadScreen(new LogsControl());
     });
-    AddMenuButton("МУТАЦИИ", () =>
+    AddMenuButton("МУТАЦИИ", "UmbrellaCorporationApp/Source/Mutation.png", () =>
     {
         LoadScreen(new MutationsControl());
     });
-    AddMenuButton("РАЗРАБОТКИ", () =>
+    AddMenuButton("РАЗРАБОТКИ", "UmbrellaCorporationApp/Source/Development.png", () =>
     {
         LoadScreen(new DevelopmentsControl());
     });
-    AddMenuButton("ВЫХОД", () =>
+    AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () =>
     {
         Application.Exit();
     });
@@ -209,7 +230,7 @@ namespace UmbrellaCorporationApp
         }
 
         // menu buttons
-        private void AddMenuButton(string text, Action onClick)
+        private void AddMenuButton(string text, string iconPath, Action onClick)
         {
             var btn = new Button
             {
@@ -220,11 +241,22 @@ namespace UmbrellaCorporationApp
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(40, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                TextImageRelation = TextImageRelation.ImageBeforeText,
                 Padding = new Padding(10, 0, 0, 0),
                 Font = new Font("Exo 2", 10)
             };
 
             btn.FlatAppearance.BorderSize = 0;
+            
+            if (System.IO.File.Exists(iconPath))
+            {
+                using (var img = Image.FromFile(iconPath))
+                {
+                    btn.Image = new Bitmap(img, new Size(24, 24));
+                }
+            }
+
 
             btn.Click += (s, e) =>
             {
@@ -246,6 +278,8 @@ namespace UmbrellaCorporationApp
             
             menuContainer.Controls.Add(btn);
             menuContainer.Controls.SetChildIndex(btn, 0);
+            btn.ImageAlign = ContentAlignment.MiddleLeft;
+            btn.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
         // demo content
