@@ -55,7 +55,8 @@ namespace UmbrellaCorporationApp
         private void InitializeUI()
         {
             // FORM
-            Text = "Umbrella Corp.";
+            Text = "UmbrellaCorp.";
+            FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
             BackColor = Color.FromArgb(20, 0, 0);
 
