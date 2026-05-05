@@ -27,8 +27,7 @@ namespace UmbrellaCorporationApp.UI
                 Margin = new Padding(0),
                 BackgroundColor = Color.FromArgb(30, 0, 0),
                 BorderStyle = BorderStyle.None,
-
-                // ❗ убираем общий Fill (он глючит)
+                
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
 
                 RowHeadersVisible = false,
@@ -45,7 +44,7 @@ namespace UmbrellaCorporationApp.UI
             // ===== HEADER =====
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 0, 0);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            grid.ColumnHeadersDefaultCellStyle.Font = new Font("Exo 2", 10, FontStyle.Bold);
             grid.ColumnHeadersHeight = 40;
 
             // ===== ROWS =====
@@ -53,7 +52,7 @@ namespace UmbrellaCorporationApp.UI
             grid.DefaultCellStyle.ForeColor = Color.White;
             grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(120, 0, 0);
             grid.DefaultCellStyle.SelectionForeColor = Color.White;
-            grid.DefaultCellStyle.Font = new Font("Segoe UI", 10);
+            grid.DefaultCellStyle.Font = new Font("Exo 2", 10);
 
             grid.RowTemplate.Height = 35;
 
@@ -79,15 +78,13 @@ namespace UmbrellaCorporationApp.UI
                 .ToList();
 
             grid.DataSource = data;
-
-            // ❗ ВАЖНО: вручную задаём растягивание колонок
+            
             foreach (DataGridViewColumn col in grid.Columns)
             {
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 col.FillWeight = 1; // равномерное распределение
             }
-
-            // ❗ чуть больше веса для длинных колонок
+            
             if (grid.Columns.Count >= 5)
             {
                 grid.Columns[0].FillWeight = 2; // ФИО

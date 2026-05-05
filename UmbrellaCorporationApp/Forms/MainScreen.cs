@@ -107,7 +107,7 @@ namespace UmbrellaCorporationApp
             AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", "UmbrellaCorporationApp/Source/Report.png",
                 () => { LoadScreen(new ReportsControl()); });
             AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", "UmbrellaCorporationApp/Source/Virus.png",
-                () => { LoadScreen(new VirusControl()); });
+                () => { LoadScreen(new VirusControl(_context)); });
             AddMenuButton("ИСПЫТУЕМЫЕ", "UmbrellaCorporationApp/Source/Subject.png",
                 () => { LoadScreen(new SubjectsControl()); });
             AddMenuButton("СТАТИСТИКА", "UmbrellaCorporationApp/Source/Statistic.png",
