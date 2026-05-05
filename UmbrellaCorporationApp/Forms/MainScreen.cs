@@ -11,56 +11,14 @@ namespace UmbrellaCorporationApp
     {
         private readonly UmbrellaDbContext _context;
         private readonly Employee _currentUser;
+
         private Button? _activeButton;
         private Panel _activeIndicator;
 
-        private async void LoadScreen(UserControl control)
-        {
-            control.Dock = DockStyle.None;
-            control.Width = content.Width;
-            control.Height = content.Height;
-            control.Left = content.Width;
-
-            content.Controls.Add(control);
-
-            // анимация въезда
-            while (control.Left > 0)
-            {
-                control.Left -= 40;
-                await Task.Delay(5);
-            }
-
-            // удаляем старые контролы
-            content.Controls.Clear();
-            control.Dock = DockStyle.Fill;
-            content.Controls.Add(control);
-        }
-
-        private void SetActiveButton(Button btn)
-        {
-            // сброс предыдущей ативной кнопки
-            if (_activeButton != null)
-            {
-                _activeButton.BackColor = Color.FromArgb(40, 0, 0);
-                _activeButton.ForeColor =  Color.White;
-            }
-            
-            // новая активная
-            _activeButton = btn;
-            btn.BackColor = Color.FromArgb(120, 0, 0);
-            btn.ForeColor  = Color.White;
-            
-            _activeIndicator.Height = btn.Height;
-            _activeIndicator.Top = btn.Top;
-            _activeIndicator.Left = 0;
-            _activeIndicator.Visible = true;
-        }
-
-        private Panel header;
-        private Panel sidebar;
         private Panel content;
-        private FlowLayoutPanel filesPanel;
-        private Panel menuContainer; 
+        private Panel sidebar;
+        private Panel header;
+        private Panel menuContainer;
 
         public MainScreen(UmbrellaDbContext context, Employee user)
         {
@@ -70,166 +28,169 @@ namespace UmbrellaCorporationApp
             InitializeUI();
         }
 
-       private void InitializeUI()
-{
-    // form
-    this.Text = "Umbrella Corp.";
-    this.WindowState = FormWindowState.Maximized;
-    this.BackColor = Color.FromArgb(20, 0, 0);
+        private async void LoadScreen(UserControl control)
+        {
+            control.Dock = DockStyle.Fill;
 
-    // header
-    header = new Panel
-    {
-        Dock = DockStyle.Top,
-        Height = 80,
-        BackColor = Color.FromArgb(60, 0, 0)
-    };
-    this.Controls.Add(header);
+            content.Controls.Clear();
+            content.Controls.Add(control);
+        }
 
-    var userLabel = new Label
-    {
-        Text = _currentUser.FullName,
-        ForeColor = Color.White,
-        Font = new Font("Oxanium", 12),
-        Location = new Point(400, 20),
-        AutoSize = true
-    };
+        private void SetActiveButton(Button btn)
+        {
+            if (_activeButton != null)
+            {
+                _activeButton.BackColor = Color.FromArgb(40, 0, 0);
+            }
 
-    var accessLabel = new Label
-    {
-        Text = $"Доступ: {_currentUser.ClearanceLevel}",
-        ForeColor = Color.Gray,
-        Location = new Point(400, 45),
-        AutoSize = true
-    };
+            _activeButton = btn;
+            btn.BackColor = Color.FromArgb(120, 0, 0);
 
-    header.Controls.Add(userLabel);
-    header.Controls.Add(accessLabel);
+            // 🔥 теперь работает нормально
+            _activeIndicator.Height = btn.Height;
+            _activeIndicator.Top = btn.Top;
+            _activeIndicator.Visible = true;
+            _activeIndicator.BringToFront();
+        }
 
-    // sidebar
-    sidebar = new Panel
-    {
-        Dock = DockStyle.Left,
-        Width = 250,
-        BackColor = Color.FromArgb(40, 0, 0)
-    };
-    this.Controls.Add(sidebar);
-    
-    menuContainer = new Panel
-    {
-        Dock = DockStyle.Fill,
-        AutoScroll = true
-    };
-    sidebar.Controls.Add(menuContainer);
+        private void InitializeUI()
+        {
+            // FORM
+            Text = "Umbrella Corp.";
+            WindowState = FormWindowState.Maximized;
+            BackColor = Color.FromArgb(20, 0, 0);
 
-    var menuLabel = new Label
-    {
-        Text = "ГЛАВНОЕ МЕНЮ",
-        ForeColor = Color.Gray,
-        Dock = DockStyle.Top,
-        Height = 40,
-        TextAlign = ContentAlignment.MiddleLeft,
-        Padding = new Padding(15, 0, 0, 0),
-        Font = new Font("Exo 2", 10, FontStyle.Bold)
-    };
-    sidebar.Controls.Add(menuLabel);
+            // HEADER
+            header = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 80,
+                BackColor = Color.FromArgb(60, 0, 0)
+            };
+            Controls.Add(header);
 
-    var logo = new PictureBox
-    {
-        Image = LoadLogo(),
-        SizeMode = PictureBoxSizeMode.Zoom,
-        Dock = DockStyle.Top,
-        Height = 80
-    };
-    sidebar.Controls.Add(logo);
+            header.Controls.Add(new Label
+            {
+                Text = _currentUser.FullName,
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 12),
+                Location = new Point(400, 20)
+            });
 
-    // buttons
-    AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ","UmbrellaCorporationApp/Source/Report.png", () =>
-    {
-        LoadScreen(new ReportsControl());
-    });
-    AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", "UmbrellaCorporationApp/Source/Virus.png", () =>
-    {
-        LoadScreen(new VirusControl());
-    });
-    AddMenuButton("ИСПЫТУЕМЫЕ", "UmbrellaCorporationApp/Source/Subject.png", () =>
-    {
-        LoadScreen(new SubjectsControl());
-    });
-    AddMenuButton("СТАТИСТИКА", "UmbrellaCorporationApp/Source/Statistic.png", () =>
-    {
-        LoadScreen(new StatisticsControl());
-    });
-    AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "UmbrellaCorporationApp/Source/Protocol.png", () =>
-    {
-        LoadScreen(new ProtocolsControl());
-    });
-    AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", "UmbrellaCorporationApp/Source/Document.png", () =>
-    {
-        LoadScreen(new FilesControl());
-    });
-    AddMenuButton("СОТРУДНИКИ", "UmbrellaCorporationApp/Source/Report.png", () =>
-    {
-        LoadScreen(new EmployeesControl());
-    });
-    AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", "UmbrellaCorporationApp/Source/Log.png", () =>
-    {
-        LoadScreen(new LogsControl());
-    });
-    AddMenuButton("МУТАЦИИ", "UmbrellaCorporationApp/Source/Mutation.png", () =>
-    {
-        LoadScreen(new MutationsControl());
-    });
-    AddMenuButton("РАЗРАБОТКИ", "UmbrellaCorporationApp/Source/Development.png", () =>
-    {
-        LoadScreen(new DevelopmentsControl());
-    });
-    AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () =>
-    {
-        Application.Exit();
-    });
+            header.Controls.Add(new Label
+            {
+                Text = $"Доступ: {_currentUser.ClearanceLevel}",
+                ForeColor = Color.Gray,
+                Location = new Point(400, 45)
+            });
 
-    _activeIndicator = new Panel()
-    {
-        Width = 4,
-        Height = 50,
-        BackColor = Color.Red,
-        Visible = false
-    };
-    
-    sidebar.Controls.Add(_activeIndicator);
-    _activeIndicator.BringToFront();
+            // SIDEBAR
+            sidebar = new Panel
+            {
+                Dock = DockStyle.Left,
+                Width = 250,
+                BackColor = Color.FromArgb(40, 0, 0)
+            };
+            Controls.Add(sidebar);
 
-    // content
-    content = new Panel
-    {
-        Dock = DockStyle.Fill,
-        BackColor = Color.FromArgb(30, 0, 0)
-    };
-    this.Controls.Add(content);
+            var logo = new PictureBox
+            {
+                Image = LoadLogo(),
+                Dock = DockStyle.Top,
+                Height = 80,
+                SizeMode = PictureBoxSizeMode.Zoom
+            };
 
-    filesPanel = new FlowLayoutPanel
-    {
-        Dock = DockStyle.Fill,
-        AutoScroll = true
-    };
-    content.Controls.Add(filesPanel);
+            var menuLabel = new Label
+            {
+                Text = "ГЛАВНОЕ МЕНЮ",
+                Dock = DockStyle.Top,
+                Height = 40,
+                ForeColor = Color.Gray,
+                Padding = new Padding(15, 0, 0, 0),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
 
-    GenerateFiles();
-}
+            menuContainer = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true
+            };
 
-        // logo loading
+            sidebar.Controls.Add(menuContainer);
+            sidebar.Controls.Add(menuLabel);
+            sidebar.Controls.Add(logo);
+
+            // 🔥 индикатор ВНУТРИ контейнера
+            _activeIndicator = new Panel
+            {
+                Width = 4,
+                BackColor = Color.Red,
+                Visible = false
+            };
+            menuContainer.Controls.Add(_activeIndicator);
+
+            // BUTTONS
+            AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ","UmbrellaCorporationApp/Source/Report.png", () =>
+            {
+                LoadScreen(new ReportsControl());
+            });
+            AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", "UmbrellaCorporationApp/Source/Virus.png", () =>
+            {
+                LoadScreen(new VirusControl());
+            });
+            AddMenuButton("ИСПЫТУЕМЫЕ", "UmbrellaCorporationApp/Source/Subject.png", () =>
+            {
+                LoadScreen(new SubjectsControl());
+            });
+            AddMenuButton("СТАТИСТИКА", "UmbrellaCorporationApp/Source/Statistic.png", () =>
+            {
+                LoadScreen(new StatisticsControl());
+            });
+            AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "UmbrellaCorporationApp/Source/Protocol.png", () =>
+            {
+                LoadScreen(new ProtocolsControl());
+            });
+            AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", "UmbrellaCorporationApp/Source/Document.png", () =>
+            {
+                LoadScreen(new FilesControl());
+            });
+            AddMenuButton("СОТРУДНИКИ", "UmbrellaCorporationApp/Source/Report.png", () =>
+            {
+                LoadScreen(new EmployeesControl(_context));
+            });
+            AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", "UmbrellaCorporationApp/Source/Log.png", () =>
+            {
+                LoadScreen(new LogsControl());
+            });
+            AddMenuButton("МУТАЦИИ", "UmbrellaCorporationApp/Source/Mutation.png", () =>
+            {
+                LoadScreen(new MutationsControl());
+            });
+            AddMenuButton("РАЗРАБОТКИ", "UmbrellaCorporationApp/Source/Development.png", () =>
+            {
+                LoadScreen(new DevelopmentsControl());
+            });
+            AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () =>
+            {
+                Application.Exit();
+            });
+
+            // CONTENT
+            content = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(30, 0, 0)
+            };
+            Controls.Add(content);
+        }
+
         private Image? LoadLogo()
         {
             string path = "umbrellaCorpLogoFinal.png";
-
-            if (System.IO.File.Exists(path))
-                return Image.FromFile(path);
-
-            return null;
+            return System.IO.File.Exists(path) ? Image.FromFile(path) : null;
         }
 
-        // menu buttons
         private void AddMenuButton(string text, string iconPath, Action onClick)
         {
             var btn = new Button
@@ -280,43 +241,6 @@ namespace UmbrellaCorporationApp
             menuContainer.Controls.SetChildIndex(btn, 0);
             btn.ImageAlign = ContentAlignment.MiddleLeft;
             btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-        }
-
-        // demo content
-        private void GenerateFiles()
-        {
-            for (int i = 1; i <= 50; i++)
-            {
-                var filePanel = new Panel
-                {
-                    Size = new Size(100, 120),
-                    BackColor = Color.FromArgb(50, 0, 0),
-                    Margin = new Padding(10)
-                };
-
-                var icon = new Label
-                {
-                    Text = " ",
-                    Font = new Font("Oxanium", 30),
-                    Dock = DockStyle.Top,
-                    Height = 70,
-                    TextAlign = ContentAlignment.MiddleCenter
-                };
-
-                var label = new Label
-                {
-                    Text = $"Отчёт №{i}",
-                    ForeColor = Color.White,
-                    Dock = DockStyle.Bottom,
-                    Height = 30,
-                    TextAlign = ContentAlignment.MiddleCenter
-                };
-
-                filePanel.Controls.Add(label);
-                filePanel.Controls.Add(icon);
-
-                filesPanel.Controls.Add(filePanel);
-            }
         }
     }
 }
