@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorporationApp.UI;
 
 namespace UmbrellaCorporationApp
 {
@@ -11,11 +12,17 @@ namespace UmbrellaCorporationApp
         private readonly UmbrellaDbContext _context;
         private readonly Employee _currentUser;
 
+        private void LoadScreen(UserControl control)
+        {
+            content.Controls.Clear();
+            content.Controls.Add(control);
+        }
+
         private Panel header;
         private Panel sidebar;
         private Panel content;
         private FlowLayoutPanel filesPanel;
-        private Panel menuContainer; // ВАЖНО
+        private Panel menuContainer; 
 
         public MainScreen(UmbrellaDbContext context, Employee user)
         {
@@ -99,17 +106,23 @@ namespace UmbrellaCorporationApp
     sidebar.Controls.Add(logo);
 
     // buttons
-    AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ");
-    AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ");
-    AddMenuButton("ИСПЫТУЕМЫЕ");
-    AddMenuButton("СТАТИСТИКА");
-    AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ");
-    AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ");
-    AddMenuButton("СОТРУДНИКИ");
-    AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ");
-    AddMenuButton("МУТАЦИИ");
-    AddMenuButton("РАЗРАБОТКИ");
-    AddMenuButton("ВЫХОД");
+    AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", () =>
+    {
+        LoadScreen(new ReportsControl());
+    });
+    //AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ");
+    //AddMenuButton("ИСПЫТУЕМЫЕ");
+    //AddMenuButton("СТАТИСТИКА");
+    //AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ");
+    //AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ");
+    //AddMenuButton("СОТРУДНИКИ");
+   // AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ");
+   // AddMenuButton("МУТАЦИИ");
+    //AddMenuButton("РАЗРАБОТКИ");
+    AddMenuButton("ВЫХОД", () =>
+    {
+        Application.Exit();
+    });
 
     // content
     content = new Panel
@@ -141,7 +154,7 @@ namespace UmbrellaCorporationApp
         }
 
         // menu buttons
-        private void AddMenuButton(string text)
+        private void AddMenuButton(string text, Action onClick)
         {
             var btn = new Button
             {
@@ -153,14 +166,16 @@ namespace UmbrellaCorporationApp
                 BackColor = Color.FromArgb(40, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Padding = new Padding(10, 0, 0, 0),
-                Font = new Font("Oxanium", 10)
+                Font = new Font("Exo 2", 20)
             };
 
             btn.FlatAppearance.BorderSize = 0;
 
+            btn.Click += (s, e) => onClick();
+
             btn.MouseEnter += (s, e) =>
                 btn.BackColor = Color.FromArgb(80, 0, 0);
-
+            
             btn.MouseLeave += (s, e) =>
                 btn.BackColor = Color.FromArgb(40, 0, 0);
             
