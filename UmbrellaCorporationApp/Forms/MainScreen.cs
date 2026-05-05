@@ -11,11 +11,28 @@ namespace UmbrellaCorporationApp
     {
         private readonly UmbrellaDbContext _context;
         private readonly Employee _currentUser;
+        private Button? _activeButton;
+        private Panel _activeIndicator;
 
         private void LoadScreen(UserControl control)
         {
             content.Controls.Clear();
             content.Controls.Add(control);
+        }
+
+        private void SetActiveButton(Button btn)
+        {
+            // сброс предыдущей ативной кнопки
+            if (_activeButton != null)
+            {
+                _activeButton.BackColor = Color.FromArgb(40, 0, 0);
+                _activeButton.ForeColor =  Color.White;
+            }
+            
+            // новая активная
+            _activeButton = btn;
+            btn.BackColor = Color.FromArgb(120, 0, 0);
+            btn.ForeColor  = Color.White;
         }
 
         private Panel header;
@@ -35,7 +52,7 @@ namespace UmbrellaCorporationApp
        private void InitializeUI()
 {
     // form
-    this.Text = "Umbrella System";
+    this.Text = "Umbrella Corp.";
     this.WindowState = FormWindowState.Maximized;
     this.BackColor = Color.FromArgb(20, 0, 0);
 
@@ -110,19 +127,57 @@ namespace UmbrellaCorporationApp
     {
         LoadScreen(new ReportsControl());
     });
-    //AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ");
-    //AddMenuButton("ИСПЫТУЕМЫЕ");
-    //AddMenuButton("СТАТИСТИКА");
-    //AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ");
-    //AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ");
-    //AddMenuButton("СОТРУДНИКИ");
-   // AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ");
-   // AddMenuButton("МУТАЦИИ");
-    //AddMenuButton("РАЗРАБОТКИ");
+    AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", () =>
+    {
+        LoadScreen(new VirusControl());
+    });
+    AddMenuButton("ИСПЫТУЕМЫЕ", () =>
+    {
+        LoadScreen(new SubjectsControl());
+    });
+    AddMenuButton("СТАТИСТИКА", () =>
+    {
+        LoadScreen(new StatisticsControl());
+    });
+    AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", () =>
+    {
+        LoadScreen(new ProtocolsControl());
+    });
+    AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", () =>
+    {
+        LoadScreen(new FilesControl());
+    });
+    AddMenuButton("СОТРУДНИКИ", () =>
+    {
+        LoadScreen(new EmployeesControl());
+    });
+    AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", () =>
+    {
+        LoadScreen(new LogsControl());
+    });
+    AddMenuButton("МУТАЦИИ", () =>
+    {
+        LoadScreen(new MutationsControl());
+    });
+    AddMenuButton("РАЗРАБОТКИ", () =>
+    {
+        LoadScreen(new DevelopmentsControl());
+    });
     AddMenuButton("ВЫХОД", () =>
     {
         Application.Exit();
     });
+
+    _activeIndicator = new Panel()
+    {
+        Width = 4,
+        Height = 50,
+        BackColor = Color.Red,
+        Visible = false
+    };
+    
+    sidebar.Controls.Add(_activeIndicator);
+    _activeIndicator.BringToFront();
 
     // content
     content = new Panel
@@ -166,18 +221,28 @@ namespace UmbrellaCorporationApp
                 BackColor = Color.FromArgb(40, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Padding = new Padding(10, 0, 0, 0),
-                Font = new Font("Exo 2", 20)
+                Font = new Font("Exo 2", 10)
             };
 
             btn.FlatAppearance.BorderSize = 0;
 
-            btn.Click += (s, e) => onClick();
+            btn.Click += (s, e) =>
+            {
+                SetActiveButton(btn);
+                onClick();
+            };
 
             btn.MouseEnter += (s, e) =>
-                btn.BackColor = Color.FromArgb(80, 0, 0);
-            
+            {
+                if (btn != _activeButton)
+                    btn.BackColor = Color.FromArgb(80, 0, 0);
+            };
+
             btn.MouseLeave += (s, e) =>
-                btn.BackColor = Color.FromArgb(40, 0, 0);
+            {
+                if (btn != _activeButton)
+                    btn.BackColor = Color.FromArgb(40, 0, 0);
+            };
             
             menuContainer.Controls.Add(btn);
             menuContainer.Controls.SetChildIndex(btn, 0);
