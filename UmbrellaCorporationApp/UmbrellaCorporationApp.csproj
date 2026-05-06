@@ -35,4 +35,16 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Source\loginBackground.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Source\umbrellaCorpLogoFinal.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Source\authBackground.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

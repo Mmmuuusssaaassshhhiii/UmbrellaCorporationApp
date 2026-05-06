@@ -120,3 +120,6 @@ D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debu
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.AuthForm.resources
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.csproj.GenerateResource.cache
 D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\obj\Debug\net8.0-windows\UmbrellaCorporationApp.MainScreen.resources
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\Source\loginBackground.jpg
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\Source\umbrellaCorpLogoFinal.png
+D:\programming\заказ\UmbrellaCorporationApp\UmbrellaCorporationApp\bin\Debug\net8.0-windows\Source\authBackground.png
