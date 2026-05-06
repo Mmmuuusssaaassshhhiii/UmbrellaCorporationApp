@@ -124,7 +124,7 @@ namespace UmbrellaCorporationApp
                 () => { LoadScreen(new MutationsControl()); });
             AddMenuButton("РАЗРАБОТКИ", "UmbrellaCorporationApp/Source/Development.png",
                 () => { LoadScreen(new DevelopmentsControl()); });
-            AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () => { Application.Exit(); });
+            AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () => { Environment.Exit(0); });
 
             // HEADER
             header = new Panel
