@@ -110,7 +110,7 @@ namespace UmbrellaCorporationApp
                 () => { LoadScreen(new VirusControl(_context)); });
             AddMenuButton("ИСПЫТУЕМЫЕ", "UmbrellaCorporationApp/Source/Subject.png",
                 () => { LoadScreen(new SubjectsControl()); });
-            AddMenuButton("СТАТИСТИКА", "UmbrellaCorporationApp/Source/Statistic.png",
+            AddMenuButton("СТАТИСТИКА И АНАЛИЗ", "UmbrellaCorporationApp/Source/Statistic.png",
                 () => { LoadScreen(new StatisticsControl()); });
             AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "UmbrellaCorporationApp/Source/Protocol.png",
                 () => { LoadScreen(new ProtocolsControl()); });
@@ -120,10 +120,14 @@ namespace UmbrellaCorporationApp
                 () => { LoadScreen(new EmployeesControl(_context)); });
             AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", "UmbrellaCorporationApp/Source/Log.png",
                 () => { LoadScreen(new LogsControl()); });
-            AddMenuButton("МУТАЦИИ", "UmbrellaCorporationApp/Source/Mutation.png",
+            AddMenuButton("ИССЛЕДОВАНИЕ МУТАЦИЙ", "UmbrellaCorporationApp/Source/Mutation.png",
+                () => { LoadScreen(new MutationsControl()); });
+            AddMenuButton("УТРАТЫ И ЛИКВИДАЦИИ", "UmbrellaCorporationApp/Source/Mutation.png",
                 () => { LoadScreen(new MutationsControl()); });
             AddMenuButton("РАЗРАБОТКИ", "UmbrellaCorporationApp/Source/Development.png",
                 () => { LoadScreen(new DevelopmentsControl()); });
+            AddMenuButton("ЭКСТРЕННЫЕ СООБЩЕНИЯ", "UmbrellaCorporationApp/Source/Mutation.png",
+                () => { LoadScreen(new MutationsControl()); });
             AddMenuButton("ВЫХОД", "UmbrellaCorporationApp/Source/Exit.png", () => { Environment.Exit(0); });
 
             // HEADER
