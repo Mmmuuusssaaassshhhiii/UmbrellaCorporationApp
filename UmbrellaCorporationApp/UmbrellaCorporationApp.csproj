@@ -39,6 +39,9 @@
       <Compile Update="Forms\ReportEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\EmployeeDossierForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -51,6 +54,12 @@
       <None Update="Source\authBackground.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="C:\Users\Musashi\Downloads\Albert Wesker.png">
+        <Link>Photos\Albert Wesker.png</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
