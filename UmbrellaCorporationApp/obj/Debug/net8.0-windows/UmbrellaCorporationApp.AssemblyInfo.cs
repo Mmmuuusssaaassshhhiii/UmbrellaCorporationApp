@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UmbrellaCorporationApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca6fe818177f173906951e248917711e0718a2fc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b630b5623be44b3957efa01073dfd5ba82b8f30")]
 [assembly: System.Reflection.AssemblyProductAttribute("UmbrellaCorporationApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UmbrellaCorporationApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -10,6 +10,15 @@ using UmbrellaCorp.Models;
 
 namespace UmbrellaCorporationApp
 {
+    public class SmoothPanel : Panel
+    {
+        public SmoothPanel()
+        {
+            DoubleBuffered = true;
+            ResizeRedraw = true;
+        }
+    }
+
     public partial class AuthForm : Form
     {
         private readonly UmbrellaDbContext _context;
@@ -20,9 +29,18 @@ namespace UmbrellaCorporationApp
         private CancellationTokenSource _fadeCts;
         private bool _isClosing;
 
+        private Image _backgroundImage;
+
         public AuthForm(UmbrellaDbContext context)
         {
             _context = context;
+
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.UserPaint,
+                     true);
+
+            UpdateStyles();
 
             BuildUI();
 
@@ -50,7 +68,7 @@ namespace UmbrellaCorporationApp
             }
             catch
             {
-                // игнор
+                // ignore
             }
         }
 
@@ -67,30 +85,43 @@ namespace UmbrellaCorporationApp
             Text = "Umbrella Corp.";
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
+            BackColor = Color.Black;
 
-            var bg = new Panel
+            if (File.Exists("authBackground.png"))
+            {
+                _backgroundImage = Image.FromFile("authBackground.png");
+            }
+
+            var bg = new SmoothPanel
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = File.Exists("authBackground.png")
-                    ? Image.FromFile("authBackground.png")
-                    : null,
-                BackgroundImageLayout = ImageLayout.Stretch,
                 BackColor = Color.Black
             };
+
+            bg.Paint += (s, e) =>
+            {
+                if (_backgroundImage != null)
+                {
+                    e.Graphics.DrawImage(_backgroundImage, bg.ClientRectangle);
+                }
+            };
+
             Controls.Add(bg);
 
-            var overlay = new Panel
+            var overlay = new SmoothPanel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(90, 0, 0, 0)
+                BackColor = Color.Transparent
             };
+
             bg.Controls.Add(overlay);
 
-            var center = new Panel
+            var center = new SmoothPanel
             {
                 Size = new Size(520, 360),
                 BackColor = Color.FromArgb(140, 25, 0, 0)
             };
+
             overlay.Controls.Add(center);
 
             void CenterPanel()
@@ -100,6 +131,7 @@ namespace UmbrellaCorporationApp
             }
 
             overlay.Resize += (s, e) => CenterPanel();
+
             CenterPanel();
 
             var logo = new PictureBox
@@ -109,37 +141,52 @@ namespace UmbrellaCorporationApp
                     : null,
                 SizeMode = PictureBoxSizeMode.Zoom,
                 Dock = DockStyle.Top,
-                Height = 110
+                Height = 110,
+                BackColor = Color.Transparent
             };
+
             center.Controls.Add(logo);
 
             loginBox = CreateTextBox("Username", false);
-            loginBox.Location = new Point(85, 130);
-            center.Controls.Add(loginBox);
 
-            passwordBox = CreateTextBox("Password", true);
-            passwordBox.Location = new Point(85, 190);
-            center.Controls.Add(passwordBox);
+            var loginContainer = CreateTextBoxContainer(
+                loginBox,
+                new Point(85, 130));
+
+            center.Controls.Add(loginContainer);
+
+            passwordBox = CreateTextBox("Badge-ID", true);
+
+            var passwordContainer = CreateTextBoxContainer(
+                passwordBox,
+                new Point(85, 190));
+
+            center.Controls.Add(passwordContainer);
 
             var btn = new Button
             {
                 Text = "LOGIN",
-                Width = 180,
-                Height = 45,
+                Width = 200,
+                Height = 50,
                 Location = new Point(170, 260),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(150, 0, 0),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                Font = new Font("Oxanium", 20, FontStyle.Bold),
+                TabStop = false
             };
 
             btn.FlatAppearance.BorderSize = 0;
 
             btn.MouseEnter += (s, e) =>
+            {
                 btn.BackColor = Color.FromArgb(220, 0, 0);
+            };
 
             btn.MouseLeave += (s, e) =>
+            {
                 btn.BackColor = Color.FromArgb(150, 0, 0);
+            };
 
             btn.Click += LoginClick;
 
@@ -149,32 +196,51 @@ namespace UmbrellaCorporationApp
             {
                 Text = "Raccoon City Facility",
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 18, FontStyle.Bold),
+                Font = new Font("Oxanium", 18, FontStyle.Bold),
                 Dock = DockStyle.Top,
                 Height = 50,
-                TextAlign = ContentAlignment.MiddleCenter
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
             };
 
             overlay.Controls.Add(title);
+
             title.BringToFront();
+        }
+
+        private SmoothPanel CreateTextBoxContainer(TextBox tb, Point location)
+        {
+            var container = new SmoothPanel
+            {
+                Size = new Size(350, 50),
+                Location = location,
+                BackColor = Color.FromArgb(60, 0, 0)
+            };
+
+            tb.Location = new Point(10, 12);
+
+            container.Controls.Add(tb);
+
+            return container;
         }
 
         private TextBox CreateTextBox(string placeholder, bool isPassword)
         {
             var tb = new TextBox
             {
-                Width = 350,
-                Height = 35,
+                Width = 330,
+                BorderStyle = BorderStyle.None,
                 BackColor = Color.FromArgb(60, 0, 0),
                 ForeColor = Color.Gray,
-                BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 11),
+                Font = new Font("Oxanium", 20),
                 Text = placeholder,
                 Tag = placeholder
             };
 
             if (isPassword)
+            {
                 tb.UseSystemPasswordChar = false;
+            }
 
             tb.GotFocus += (s, e) =>
             {
@@ -184,7 +250,9 @@ namespace UmbrellaCorporationApp
                     tb.ForeColor = Color.White;
 
                     if (isPassword)
+                    {
                         tb.UseSystemPasswordChar = true;
+                    }
                 }
             };
 
@@ -196,7 +264,9 @@ namespace UmbrellaCorporationApp
                     tb.ForeColor = Color.Gray;
 
                     if (isPassword)
+                    {
                         tb.UseSystemPasswordChar = false;
+                    }
                 }
             };
 
@@ -208,7 +278,7 @@ namespace UmbrellaCorporationApp
             string fullName = loginBox.Text.Trim();
             string badgeId = passwordBox.Text.Trim();
 
-            if (fullName == "Username" || badgeId == "Password")
+            if (fullName == "Username" || badgeId == "Badge-ID")
             {
                 MessageBox.Show("Заполни поля");
                 return;
@@ -226,14 +296,14 @@ namespace UmbrellaCorporationApp
             }
 
             var main = new MainScreen(_context, employee);
-            
+
             main.Show();
-            
-            this.Hide();
-            
+
+            Hide();
+
             main.FormClosed += (s, args) =>
             {
-                this.Close();
+                Close();
             };
         }
     }
