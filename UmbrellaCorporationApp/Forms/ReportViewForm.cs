@@ -62,7 +62,7 @@ public class ReportViewerForm : Form
 
             FlatStyle = FlatStyle.Flat,
 
-            Font = new Font("Oxanium", 18, FontStyle.Bold),
+            Font = new Font("Exo 2", 18, FontStyle.Bold),
 
             ForeColor = Color.White,
 
@@ -141,7 +141,7 @@ public class ReportViewerForm : Form
         {
             Text = "UMBRELLA CORPORATION",
 
-            Font = new Font("Times New Roman", 24, FontStyle.Bold),
+            Font = new Font("Exo 2", 24, FontStyle.Bold),
 
             ForeColor = Color.Black,
 
@@ -156,7 +156,7 @@ public class ReportViewerForm : Form
         {
             Text = "RACCOON CITY RESEARCH FACILITY",
 
-            Font = new Font("Times New Roman", 12),
+            Font = new Font("Exo 2", 12),
 
             ForeColor = Color.DimGray,
 
@@ -183,7 +183,7 @@ public class ReportViewerForm : Form
         {
             Text = report.Title,
 
-            Font = new Font("Times New Roman", 22, FontStyle.Bold),
+            Font = new Font("Exo 2", 22, FontStyle.Bold),
 
             ForeColor = Color.Black,
 
@@ -246,7 +246,7 @@ public class ReportViewerForm : Form
 
             ReadOnly = true,
 
-            Font = new Font("Times New Roman", 14),
+            Font = new Font("Exo 2", 14),
 
             Location = new Point(75, 370),
 
@@ -350,7 +350,7 @@ public class ReportViewerForm : Form
 
     private Image? LoadLogo()
     {
-        string path = "umbrellaCorpLogoFinal.png";
+        string path = "Umbrella.png";
 
         return System.IO.File.Exists(path)
             ? Image.FromFile(path)

@@ -43,7 +43,7 @@ public class ReportsControl : UserControl
 
         var createBtn = CreateTopButton("СОЗДАТЬ ОТЧЕТ");
 
-        createBtn.Location = new Point(20, 15);
+        createBtn.Location = new Point(10, 15);
 
         createBtn.Click += (s, e) =>
         {

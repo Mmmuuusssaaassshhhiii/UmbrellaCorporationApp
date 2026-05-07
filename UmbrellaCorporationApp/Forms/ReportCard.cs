@@ -27,7 +27,7 @@ public class ReportCard : Panel
 
         Size = new Size(150, _collapsedHeight);
 
-        Margin = new Padding(20);
+        Margin = new Padding(60);
 
         Cursor = Cursors.Hand;
 
