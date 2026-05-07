@@ -151,6 +151,7 @@ namespace UmbrellaCorporationApp
 
             var loginContainer = CreateTextBoxContainer(
                 loginBox,
+                "User.png",
                 new Point(85, 130));
 
             center.Controls.Add(loginContainer);
@@ -159,6 +160,7 @@ namespace UmbrellaCorporationApp
 
             var passwordContainer = CreateTextBoxContainer(
                 passwordBox,
+                "Card.png",
                 new Point(85, 190));
 
             center.Controls.Add(passwordContainer);
@@ -172,7 +174,7 @@ namespace UmbrellaCorporationApp
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(150, 0, 0),
                 ForeColor = Color.White,
-                Font = new Font("Oxanium", 20, FontStyle.Bold),
+                Font = new Font("Exo 2", 20, FontStyle.Bold),
                 TabStop = false
             };
 
@@ -191,24 +193,100 @@ namespace UmbrellaCorporationApp
             btn.Click += LoginClick;
 
             center.Controls.Add(btn);
-
-            var title = new Label
+            
+            var topContainer = new FlowLayoutPanel
             {
-                Text = "Raccoon City Facility",
-                ForeColor = Color.White,
-                Font = new Font("Oxanium", 18, FontStyle.Bold),
                 Dock = DockStyle.Top,
-                Height = 50,
-                TextAlign = ContentAlignment.MiddleCenter,
-                BackColor = Color.Transparent
+
+                Height = 120,
+
+                FlowDirection = FlowDirection.TopDown,
+
+                WrapContents = false,
+
+                BackColor = Color.Transparent,
+
+                Padding = new Padding(0, 0, 0, 0)
             };
 
-            overlay.Controls.Add(title);
+            overlay.Controls.Add(topContainer);
+            
+            var bottomContainer = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
 
-            title.BringToFront();
+                Height = 170,
+
+                FlowDirection = FlowDirection.TopDown,
+
+                WrapContents = false,
+
+                BackColor = Color.Transparent,
+
+                Padding = new Padding(0, 0, 0, 0)
+            };
+
+            overlay.Controls.Add(bottomContainer);
+
+            var title = CreateTitle(
+                "UMBRELLA Corp Biotechnological Division LLC",
+                false);
+
+            var title2 = CreateTitle(
+                "Raccoon City Facility",
+                true);
+
+            var title3 = CreateTitle(
+                "SECURITY WARNING!",
+                true);
+
+            var title4 = CreateTitle(
+                "Anything viewed beyond this point is covered under the UMBRELLA Corp Security Agreement section of the Employee Code of Conduct.",
+                false);
+
+            var title5 = CreateTitle(
+                "Second Party viewing by individuals without proper security clearance, will be handled by the highest administrative level possible!",
+                false);
+
+            topContainer.Controls.Add(title);
+
+            topContainer.Controls.Add(title2);
+
+            bottomContainer.Controls.Add(title3);
+
+            bottomContainer.Controls.Add(title4);
+
+            bottomContainer.Controls.Add(title5);
+        }
+        
+        private Label CreateTitle(string text, bool bold)
+        {
+            return new Label
+            {
+                Text = text,
+
+                Width = Screen.PrimaryScreen.Bounds.Width,
+
+                Height = 45,
+
+                Margin = new Padding(0, 2, 0, 2),
+
+                ForeColor = Color.White,
+
+                Font = new Font(
+                    "Exo 2",
+                    18,
+                    bold
+                        ? FontStyle.Bold
+                        : FontStyle.Regular),
+
+                TextAlign = ContentAlignment.MiddleCenter,
+
+                BackColor = Color.Transparent
+            };
         }
 
-        private SmoothPanel CreateTextBoxContainer(TextBox tb, Point location)
+        private SmoothPanel CreateTextBoxContainer(TextBox tb, string iconPath, Point location)
         {
             var container = new SmoothPanel
             {
@@ -217,8 +295,21 @@ namespace UmbrellaCorporationApp
                 BackColor = Color.FromArgb(60, 0, 0)
             };
 
-            tb.Location = new Point(10, 12);
+            var icon = new PictureBox
+            {
+                Size = new Size(24, 24),
+                Location = new Point(12, 13),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                BackColor = Color.Transparent,
+                Image = File.Exists(iconPath)
+                    ? Image.FromFile(iconPath)
+                    : SystemIcons.Information.ToBitmap()
+            };
 
+            tb.Location = new Point(45, 10);
+            tb.Width = 290;
+
+            container.Controls.Add(icon);
             container.Controls.Add(tb);
 
             return container;
