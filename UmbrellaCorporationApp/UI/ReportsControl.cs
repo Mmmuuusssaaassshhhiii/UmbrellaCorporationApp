@@ -23,19 +23,6 @@ public class ReportsControl : UserControl
 
         BackColor = Color.FromArgb(30, 0, 0);
 
-        var title = new Label
-        {
-            Text = "ЛАБОРАТОРНЫЕ ОТЧЁТЫ",
-            Dock = DockStyle.Top,
-            Height = 60,
-            Font = new Font("Exo 2", 20),
-            ForeColor = Color.White,
-            TextAlign = ContentAlignment.MiddleLeft,
-            Padding = new Padding(20, 0, 0, 0)
-        };
-
-        Controls.Add(title);
-
         var container = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
