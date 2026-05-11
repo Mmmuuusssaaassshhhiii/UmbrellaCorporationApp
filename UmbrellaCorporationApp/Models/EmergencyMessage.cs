@@ -8,15 +8,26 @@ namespace UmbrellaCorp.Models
     {
         [Key]
         public int Id { get; set; }
-        public string MessageType { get; set; } = string.Empty;
-        public string Subject { get; set; } = string.Empty;
-        public string Body { get; set; } = string.Empty;
+        
+        [ForeignKey(nameof(Sender))]
+        public int SenderId { get; set; }
 
-        [ForeignKey("Employee")]
-        public int? SentById { get; set; }
-        public virtual Employee? SentBy { get; set; }
+        public virtual Employee Sender { get; set; } = null!;
+        
+        [ForeignKey(nameof(Receiver))]
+        public int ReceiverId { get; set; }
 
+        public virtual Employee Receiver { get; set; } = null!;
+        
+        [Required]
+        public string Text { get; set; } = string.Empty;
+        
         public DateTime SentAt { get; set; } = DateTime.Now;
-        public bool IsAcknowledged { get; set; } = false;
+        
+        public bool IsRead { get; set; }
+        
+        public bool IsEdited { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿﻿using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Models;
 using UmbrellaCorp.Models.Enums;
 
@@ -174,10 +174,20 @@ namespace UmbrellaCorp.Data
 
             // EmergencyMessage → Employee
             modelBuilder.Entity<EmergencyMessage>()
-                .HasOne(e => e.SentBy)
+                .HasOne(m => m.Sender)
                 .WithMany()
-                .HasForeignKey(e => e.SentById)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EmergencyMessage>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EmergencyMessage>()
+                .Property(m => m.Text)
+                .HasColumnType("longtext");
 
 
             // =========================

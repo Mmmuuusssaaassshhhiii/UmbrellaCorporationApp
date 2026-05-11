@@ -22,11 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Repositories\" />
-      <Folder Include="Services\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="Forms\AuthForm.cs">
         <SubType>Form</SubType>
       </Compile>

@@ -323,7 +323,7 @@ namespace UmbrellaCorporationApp
                 BorderStyle = BorderStyle.None,
                 BackColor = Color.FromArgb(60, 0, 0),
                 ForeColor = Color.Gray,
-                Font = new Font("Oxanium", 20),
+                Font = new Font("Exo 2", 15),
                 Text = placeholder,
                 Tag = placeholder
             };

@@ -10,44 +10,105 @@ namespace UmbrellaCorporationApp.UI
     {
         private readonly Employee _employee;
 
+        private readonly Label _name;
+
+        private bool _hovered;
+
         public EmployeeCard(Employee employee)
         {
             _employee = employee;
 
-            Size = new Size(200, 220);
-            Margin = new Padding(15);
-            BackColor = Color.FromArgb(45, 0, 0);
+            Size = new Size(150, 180);
+            Margin = new Padding(20);
+
             Cursor = Cursors.Hand;
 
             DoubleBuffered = true;
 
+            BackColor = Color.Transparent;
+            Padding = new Padding(10);
+
+            // ===== AVATAR =====
             var photo = new PictureBox
             {
                 Dock = DockStyle.Top,
-                Height = 130,
+                Height = 120,
                 SizeMode = PictureBoxSizeMode.Zoom,
+                BackColor = Color.Transparent,
                 Image = LoadPhoto(employee)
             };
 
-            var name = new Label
+            // ===== NAME =====
+            _name = new Label
             {
                 Text = employee.FullName,
                 Dock = DockStyle.Top,
+                Height = 40,
                 ForeColor = Color.White,
-                TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Exo 2", 10, FontStyle.Bold),
-                Height = 30
+                TextAlign = ContentAlignment.MiddleCenter,
+                AutoEllipsis = true,
+                BackColor = Color.Transparent
             };
-            
-            Controls.Add(name);
+
+            Controls.Add(_name);
             Controls.Add(photo);
 
+            // ===== CLICK =====
             Click += OpenProfile;
             photo.Click += OpenProfile;
-            name.Click += OpenProfile;
+            _name.Click += OpenProfile;
 
-            MouseEnter += (_, _) => BackColor = Color.FromArgb(80, 0, 0);
-            MouseLeave += (_, _) => BackColor = Color.FromArgb(45, 0, 0);
+            // ===== HOVER =====
+            MouseEnter += CardMouseEnter;
+            MouseLeave += CardMouseLeave;
+
+            photo.MouseEnter += CardMouseEnter;
+            photo.MouseLeave += CardMouseLeave;
+
+            _name.MouseEnter += CardMouseEnter;
+            _name.MouseLeave += CardMouseLeave;
+
+            Paint += DrawBorder;
+        }
+
+        private void CardMouseEnter(object? sender, EventArgs e)
+        {
+            _hovered = true;
+
+            BackColor = Color.FromArgb(40, 0, 0);
+
+            Invalidate();
+        }
+
+        private void CardMouseLeave(object? sender, EventArgs e)
+        {
+            Point pos = PointToClient(Cursor.Position);
+
+            if (ClientRectangle.Contains(pos))
+                return;
+
+            _hovered = false;
+
+            BackColor = Color.Transparent;
+
+            Invalidate();
+        }
+
+        private void DrawBorder(object? sender, PaintEventArgs e)
+        {
+            if (!_hovered)
+                return;
+
+            using var pen = new Pen(Color.FromArgb(180, 0, 0), 2);
+
+            e.Graphics.DrawRectangle(
+                pen,
+                1,
+                1,
+                Width - 3,
+                Height - 3
+            );
         }
 
         private void OpenProfile(object? sender, EventArgs e)
@@ -59,34 +120,10 @@ namespace UmbrellaCorporationApp.UI
         {
             try
             {
-                // 1. Если в базе есть путь (рекомендую добавить поле PhotoPath)
-                if (!string.IsNullOrWhiteSpace(emp.PhotoPath))
-                {
-                    var dbPath = GetFullPath(emp.PhotoPath);
-
-                    if (File.Exists(dbPath))
-                        return Image.FromFile(dbPath);
-                }
-
-                // 2. fallback по Id
-                var idPath = GetFullPath($"Photos/{emp.Id}.png");
-
-                if (File.Exists(idPath))
-                    return Image.FromFile(idPath);
-
-                // 3. fallback по имени (как у тебя сейчас в базе)
-                var namePath = GetFullPath($"Photos/{emp.FullName}.png");
-
-                if (File.Exists(namePath))
-                    return Image.FromFile(namePath);
-
-                // 4. дефолт
-                var defaultPath = GetFullPath("Photos/default.png");
-
-                if (File.Exists(defaultPath))
-                    return Image.FromFile(defaultPath);
-
-                return SystemIcons.Application.ToBitmap();
+                return LoadImageSafe(emp.PhotoPath)
+                    ?? LoadImageSafe($"Photos/{emp.Id}.png")
+                    ?? LoadImageSafe($"Photos/{emp.FullName}.png")
+                    ?? SystemIcons.Application.ToBitmap();
             }
             catch
             {
@@ -94,9 +131,19 @@ namespace UmbrellaCorporationApp.UI
             }
         }
 
-        private string GetFullPath(string relativePath)
+        private Image? LoadImageSafe(string path)
         {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativePath);
+            if (string.IsNullOrWhiteSpace(path))
+                return null;
+
+            var full = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                path);
+
+            if (!File.Exists(full))
+                return null;
+
+            return Image.FromFile(full);
         }
     }
 }
