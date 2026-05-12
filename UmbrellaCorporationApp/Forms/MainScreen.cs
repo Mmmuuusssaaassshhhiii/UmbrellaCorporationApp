@@ -263,7 +263,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new ProtocolsControl()));
 
             AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", "Document.png",
-                () => LoadScreen(new FilesControl()));
+                () => LoadScreen(new FilesControl(_context, _currentUser)));
 
             AddMenuButton("СОТРУДНИКИ", "Employee.png",
                 () => LoadScreen(new EmployeesControl(_context)));

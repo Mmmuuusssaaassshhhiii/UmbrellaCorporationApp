@@ -40,6 +40,12 @@
       <Compile Update="Forms\ChatForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\FileViewForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Forms\FileEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
