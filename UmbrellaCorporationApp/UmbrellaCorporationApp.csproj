@@ -37,6 +37,9 @@
       <Compile Update="Forms\EmployeeDossierForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\ChatForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

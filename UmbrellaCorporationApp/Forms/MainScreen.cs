@@ -265,7 +265,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new DevelopmentsControl()));
 
             AddMenuButton("СООБЩЕНИЯ", "Message.png",
-                () => LoadScreen(new MutationsControl()));
+                () => LoadScreen(new MessageControl(_context, _currentUser)));
 
             AddMenuButton("ВЫХОД", "Exit.png",
                 () => Environment.Exit(0));
