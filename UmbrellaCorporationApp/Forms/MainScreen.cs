@@ -22,6 +22,16 @@ namespace UmbrellaCorporationApp
         private Panel sidebar = null!;
         private Panel header = null!;
         private Panel menuContainer = null!;
+        
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _currentUser.IsOnline = false;
+            _currentUser.LastSeen = DateTime.Now;
+
+            _context.SaveChanges();
+
+            base.OnFormClosing(e);
+        }
 
         public MainScreen(UmbrellaDbContext context, Employee user)
         {
@@ -208,7 +218,9 @@ namespace UmbrellaCorporationApp
             var onlineDot = new Panel
             {
                 Size = new Size(10, 10),
-                BackColor = Color.LimeGreen,
+                BackColor = _currentUser.IsOnline
+                    ? Color.LimeGreen
+                    : Color.DarkRed,
                 Location = new Point(0, 4)
             };
 
@@ -218,8 +230,12 @@ namespace UmbrellaCorporationApp
 
             var onlineLabel = new Label
             {
-                Text = "Online",
-                ForeColor = Color.LimeGreen,
+                Text = _currentUser.IsOnline
+                    ? "Online"
+                    : "Offline",
+                ForeColor = _currentUser.IsOnline
+                    ? Color.LimeGreen
+                    : Color.DarkRed,
                 Font = new Font("Exo 2", 9),
                 Location = new Point(15, 1),
                 AutoSize = true,

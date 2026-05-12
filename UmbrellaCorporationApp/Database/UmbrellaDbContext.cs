@@ -1,6 +1,7 @@
 ﻿﻿using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Models;
 using UmbrellaCorp.Models.Enums;
+using UmbrellaCorporationApp.Models;
 
 namespace UmbrellaCorp.Data
 {
@@ -27,6 +28,7 @@ namespace UmbrellaCorp.Data
         public DbSet<Loss> Losses { get; set; }
         public DbSet<Mutation> Mutations { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
+        public DbSet<UserSession> UserSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -171,6 +173,13 @@ namespace UmbrellaCorp.Data
                 .WithMany()
                 .HasForeignKey(c => c.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            // UserSession → Employee
+            modelBuilder.Entity<UserSession>()
+                .HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // EmergencyMessage → Employee
             modelBuilder.Entity<EmergencyMessage>()

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorp.Models
@@ -22,6 +24,7 @@ namespace UmbrellaCorp.Models
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Alive;
 
         public DateTime HireDate { get; set; }
+
         public DateTime? TerminationDate { get; set; }
 
         [MaxLength(50)]
@@ -29,10 +32,18 @@ namespace UmbrellaCorp.Models
 
         public string? PhotoPath { get; set; }
 
-        // Навигация
+        // ===== ONLINE STATUS =====
+        public bool IsOnline { get; set; }
+
+        public DateTime LastSeen { get; set; } = DateTime.Now;
+
+        // ===== NAVIGATION =====
         public List<LabReport> LabReports { get; set; } = new();
+
         public List<Sample> Samples { get; set; } = new();
+
         public List<Development> Developments { get; set; } = new();
+
         public List<IncidentLog> IncidentLogs { get; set; } = new();
     }
 }

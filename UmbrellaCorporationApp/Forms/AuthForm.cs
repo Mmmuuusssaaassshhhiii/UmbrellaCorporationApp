@@ -385,6 +385,11 @@ namespace UmbrellaCorporationApp
                 MessageBox.Show("Неверные данные");
                 return;
             }
+            
+            employee.IsOnline = true;
+            employee.LastSeen = DateTime.Now;
+
+            _context.SaveChanges();
 
             var main = new MainScreen(_context, employee);
 

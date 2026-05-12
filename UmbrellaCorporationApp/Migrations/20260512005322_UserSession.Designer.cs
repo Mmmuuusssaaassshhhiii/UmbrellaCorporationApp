@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UmbrellaCorp.Data;
 
@@ -11,9 +12,11 @@ using UmbrellaCorp.Data;
 namespace UmbrellaCorporationApp.Migrations
 {
     [DbContext(typeof(UmbrellaDbContext))]
-    partial class UmbrellaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512005322_UserSession")]
+    partial class UserSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,12 +220,6 @@ namespace UmbrellaCorporationApp.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("HireDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsOnline")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("LastSeen")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("PhotoPath")

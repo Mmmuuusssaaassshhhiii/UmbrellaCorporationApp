@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UmbrellaCorp.Data;
 
@@ -11,9 +12,11 @@ using UmbrellaCorp.Data;
 namespace UmbrellaCorporationApp.Migrations
 {
     [DbContext(typeof(UmbrellaDbContext))]
-    partial class UmbrellaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512005621_UserSessionInEmployee")]
+    partial class UserSessionInEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
