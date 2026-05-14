@@ -58,6 +58,12 @@
       <Compile Update="Forms\IncidentEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\MutationViewForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Forms\MytationEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

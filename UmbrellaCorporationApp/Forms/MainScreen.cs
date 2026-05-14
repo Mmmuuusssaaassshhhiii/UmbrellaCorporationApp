@@ -229,10 +229,10 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new LogsControl(_context, _currentUser)));
 
             AddMenuButton("ИССЛЕДОВАНИЕ МУТАЦИЙ", "Mutation.png",
-                () => LoadScreen(new MutationsControl()));
+                () => LoadScreen(new MutationsControl(_context, _currentUser)));
 
             AddMenuButton("УТРАТЫ И ЛИКВИДАЦИИ", "Loss.png",
-                () => LoadScreen(new MutationsControl()));
+                () => LoadScreen(new LossControl()));
 
             AddMenuButton("РАЗРАБОТКИ", "Development.png",
                 () => LoadScreen(new DevelopmentsControl()));
