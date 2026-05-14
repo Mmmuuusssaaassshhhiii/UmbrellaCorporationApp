@@ -211,7 +211,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new VirusControl(_context)));
 
             AddMenuButton("ИСПЫТУЕМЫЕ", "Zombie.png",
-                () => LoadScreen(new SubjectsControl()));
+                () => LoadScreen(new SubjectsControl(_context)));
 
             AddMenuButton("СТАТИСТИКА И АНАЛИЗ", "Statistic.png",
                 () => LoadScreen(new StatisticsControl()));

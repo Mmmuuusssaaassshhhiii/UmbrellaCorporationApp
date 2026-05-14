@@ -46,6 +46,12 @@
       <Compile Update="Forms\FileEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\SubjectEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Forms\SubjectViewForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
