@@ -226,7 +226,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new EmployeesControl(_context)));
 
             AddMenuButton("ЖУРНАЛ ПРОИСШЕСТВИЙ", "Log.png",
-                () => LoadScreen(new LogsControl()));
+                () => LoadScreen(new LogsControl(_context, _currentUser)));
 
             AddMenuButton("ИССЛЕДОВАНИЕ МУТАЦИЙ", "Mutation.png",
                 () => LoadScreen(new MutationsControl()));

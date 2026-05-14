@@ -219,6 +219,7 @@ namespace UmbrellaCorporationApp
                 Text = "LOGIN",
                 Width = 200,
                 Height = 50,
+                Cursor = Cursors.Hand,
                 Location = new Point(170, 260),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(150, 0, 0),

@@ -209,7 +209,7 @@ public class ReportViewerForm : Form
                 $"AUTHOR: {report.Author?.FullName ?? "UNKNOWN"}\n" +
                 $"DATE: {report.CreatedAt:dd.MM.yyyy HH:mm}",
 
-            Font = new Font("Consolas", 11),
+            Font = new Font("Exo 2", 11),
 
             ForeColor = Color.Black,
 
@@ -334,7 +334,7 @@ public class ReportViewerForm : Form
 
             ForeColor = color,
 
-            Font = new Font("Arial", 14, FontStyle.Bold),
+            Font = new Font("Exo 2", 14, FontStyle.Bold),
 
             AutoSize = true,
 
