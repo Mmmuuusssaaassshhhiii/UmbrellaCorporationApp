@@ -217,7 +217,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new StatisticsControl()));
 
             AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "Protocol.png",
-                () => LoadScreen(new ProtocolsControl()));
+                () => LoadScreen(new ProtocolsControl(_context, _currentUser)));
 
             AddMenuButton("ЗАСЕКРЕЧЕННЫЕ ФАЙЛЫ", "Document.png",
                 () => LoadScreen(new FilesControl(_context, _currentUser)));

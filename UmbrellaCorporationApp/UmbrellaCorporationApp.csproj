@@ -64,6 +64,12 @@
       <Compile Update="Forms\MytationEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\ProtocolViewerForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Forms\ProtocolEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
