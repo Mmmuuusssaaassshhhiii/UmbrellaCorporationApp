@@ -8,6 +8,7 @@ namespace UmbrellaCorporationApp.Forms;
 public class SubjectViewForm : Form
 {
     private Panel sheet = null!;
+    private Button closeBtn = null!;
 
     public SubjectViewForm(TestSubject subject)
     {
@@ -109,9 +110,6 @@ public class SubjectViewForm : Form
             top);
         
         top += 100;
-        
-        AddField("ЗАМЕТКИ", subject.Notes, top);
-        top += 100;
 
         var notesTitle = new Label
         {
@@ -140,7 +138,7 @@ public class SubjectViewForm : Form
 
             BackColor = Color.White,
 
-            Font = new Font("Consolas", 13),
+            Font = new Font("Exo 2", 13),
 
             Text = subject.Notes
         };
@@ -170,7 +168,7 @@ public class SubjectViewForm : Form
         {
             Text = value,
 
-            Font = new Font("Consolas", 14),
+            Font = new Font("Exo 2", 14),
 
             ForeColor = Color.Black,
 
@@ -186,26 +184,39 @@ public class SubjectViewForm : Form
 
     private void InitializeCloseButton()
     {
-        var closeBtn = new Button
+        closeBtn = new Button
         {
             Text = "X",
 
             Width = 60,
-
             Height = 60,
 
             FlatStyle = FlatStyle.Flat,
 
-            ForeColor = Color.White,
-
             Font = new Font("Exo 2", 18, FontStyle.Bold),
 
-            Location = new Point(
-                ClientSize.Width - 90,
-                20)
+            ForeColor = Color.White,
+
+            Cursor = Cursors.Hand,
+
+            Anchor = AnchorStyles.Top | AnchorStyles.Right
         };
 
         closeBtn.FlatAppearance.BorderSize = 0;
+
+        closeBtn.Location = new Point(
+            ClientSize.Width - closeBtn.Width - 25,
+            25);
+
+        closeBtn.MouseEnter += (s, e) =>
+        {
+            closeBtn.ForeColor = Color.Gray;
+        };
+
+        closeBtn.MouseLeave += (s, e) =>
+        {
+            closeBtn.ForeColor = Color.White;
+        };
 
         closeBtn.Click += (s, e) => Close();
 
