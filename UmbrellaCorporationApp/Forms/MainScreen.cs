@@ -22,16 +22,8 @@ namespace UmbrellaCorporationApp
         private Panel sidebar = null!;
         private Panel header = null!;
         private Panel menuContainer = null!;
-        
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            _currentUser.IsOnline = false;
-            _currentUser.LastSeen = DateTime.Now;
 
-            _context.SaveChanges();
-
-            base.OnFormClosing(e);
-        }
+        private bool _isLoggingOut;
 
         public MainScreen(UmbrellaDbContext context, Employee user)
         {
@@ -43,9 +35,52 @@ namespace UmbrellaCorporationApp
             Shown += (_, _) => OpenDefaultScreen();
         }
 
+        // ================= SAFE CLOSE =================
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (_isLoggingOut)
+            {
+                base.OnFormClosing(e);
+                return;
+            }
+
+            e.Cancel = true;
+            Logout(); // всегда через единый метод
+        }
+
+        // ================= LOGOUT FIX =================
+        private void Logout()
+        {
+            if (_isLoggingOut)
+                return;
+
+            _isLoggingOut = true;
+
+            try
+            {
+                _currentUser.IsOnline = false;
+                _currentUser.LastSeen = DateTime.Now;
+                _context.SaveChanges();
+            }
+            catch { }
+
+            // КРИТИЧНО: закрываем форму БЕЗ вложенных FormClosed событий
+            BeginInvoke(new Action(() =>
+            {
+                Hide();
+
+                var auth = new AuthForm(_context);
+                auth.Show();
+
+                Dispose();
+            }));
+        }
+
+        // ================= NAV =================
         private void OpenDefaultScreen()
         {
-            if (_reportsButton == null) return;
+            if (_reportsButton == null)
+                return;
 
             SetActiveButton(_reportsButton);
             LoadScreen(new ReportsControl(_context, _currentUser));
@@ -64,6 +99,7 @@ namespace UmbrellaCorporationApp
                 _activeButton.BackColor = Color.FromArgb(40, 0, 0);
 
             _activeButton = btn;
+
             btn.BackColor = Color.FromArgb(120, 0, 0);
 
             _activeIndicator.Height = btn.Height;
@@ -72,6 +108,7 @@ namespace UmbrellaCorporationApp
             _activeIndicator.BringToFront();
         }
 
+        // ================= UI =================
         private void InitializeUI()
         {
             Text = "UmbrellaCorp.";
@@ -79,7 +116,6 @@ namespace UmbrellaCorporationApp
             WindowState = FormWindowState.Maximized;
             BackColor = Color.FromArgb(20, 0, 0);
 
-            // ===== CONTENT =====
             content = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -87,7 +123,6 @@ namespace UmbrellaCorporationApp
             };
             Controls.Add(content);
 
-            // ===== SIDEBAR =====
             sidebar = new Panel
             {
                 Dock = DockStyle.Left,
@@ -122,10 +157,8 @@ namespace UmbrellaCorporationApp
                 BackColor = Color.Red,
                 Visible = false
             };
-
             menuContainer.Controls.Add(_activeIndicator);
 
-            // ===== HEADER =====
             header = new Panel
             {
                 Dock = DockStyle.Top,
@@ -134,119 +167,43 @@ namespace UmbrellaCorporationApp
             };
             Controls.Add(header);
 
-            // ===== LOGO =====
             var logo = new PictureBox
             {
                 Image = LoadLogo(),
                 Dock = DockStyle.Left,
                 Width = sidebar.Width,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Transparent
+                SizeMode = PictureBoxSizeMode.Zoom
             };
             header.Controls.Add(logo);
 
-            // ===== USER PANEL =====
             var userPanel = new Panel
             {
                 Size = new Size(500, 90),
-                Location = new Point(sidebar.Width + 40, 5),
-                BackColor = Color.Transparent
+                Location = new Point(sidebar.Width + 40, 5)
             };
             header.Controls.Add(userPanel);
 
-            // ===== AVATAR =====
-            var avatar = new PictureBox
-            {
-                Size = new Size(76, 76),
-                Location = new Point(0, 7),
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Transparent,
-                Cursor = Cursors.Hand,
-                Image = LoadUserAvatar()
-            };
-
-            GraphicsPath gp = new GraphicsPath();
-            gp.AddEllipse(0, 0, avatar.Width - 1, avatar.Height - 1);
-            avatar.Region = new Region(gp);
-
-            avatar.MouseEnter += (_, _) =>
-            {
-                avatar.Size = new Size(82, 82);
-                avatar.Location = new Point(-3, 4);
-            };
-
-            avatar.MouseLeave += (_, _) =>
-            {
-                avatar.Size = new Size(76, 76);
-                avatar.Location = new Point(0, 7);
-            };
-
-            userPanel.Controls.Add(avatar);
-
-            // ===== USER NAME =====
             var userName = new Label
             {
                 Text = _currentUser.FullName,
                 ForeColor = Color.White,
                 Font = new Font("Exo 2", 15, FontStyle.Bold),
                 Location = new Point(95, 18),
-                AutoSize = true,
-                BackColor = Color.Transparent
+                AutoSize = true
             };
             userPanel.Controls.Add(userName);
 
-            // ===== ACCESS =====
             var access = new Label
             {
                 Text = $"Уровень доступа: {_currentUser.ClearanceLevel}",
                 ForeColor = Color.Gray,
                 Font = new Font("Exo 2", 10),
                 Location = new Point(95, 48),
-                AutoSize = true,
-                BackColor = Color.Transparent
+                AutoSize = true
             };
             userPanel.Controls.Add(access);
 
-            // ===== ONLINE STATUS (NEW) =====
-            var onlinePanel = new Panel
-            {
-                Size = new Size(200, 20),
-                Location = new Point(95, 70),
-                BackColor = Color.Transparent
-            };
-
-            var onlineDot = new Panel
-            {
-                Size = new Size(10, 10),
-                BackColor = _currentUser.IsOnline
-                    ? Color.LimeGreen
-                    : Color.DarkRed,
-                Location = new Point(0, 4)
-            };
-
-            GraphicsPath dotPath = new GraphicsPath();
-            dotPath.AddEllipse(0, 0, onlineDot.Width - 1, onlineDot.Height - 1);
-            onlineDot.Region = new Region(dotPath);
-
-            var onlineLabel = new Label
-            {
-                Text = _currentUser.IsOnline
-                    ? "Online"
-                    : "Offline",
-                ForeColor = _currentUser.IsOnline
-                    ? Color.LimeGreen
-                    : Color.DarkRed,
-                Font = new Font("Exo 2", 9),
-                Location = new Point(15, 1),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
-
-            onlinePanel.Controls.Add(onlineDot);
-            onlinePanel.Controls.Add(onlineLabel);
-            userPanel.Controls.Add(onlinePanel);
-
-            // ===== MENU =====
+            // ================= MENU =================
             _reportsButton = AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", "Report.png",
                 () => LoadScreen(new ReportsControl(_context, _currentUser)));
 
@@ -284,7 +241,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new MessageControl(_context, _currentUser)));
 
             AddMenuButton("ВЫХОД", "Exit.png",
-                () => Environment.Exit(0));
+                Logout);
         }
 
         private Image? LoadLogo()
@@ -293,35 +250,7 @@ namespace UmbrellaCorporationApp
             return File.Exists(path) ? Image.FromFile(path) : null;
         }
 
-        private Image LoadUserAvatar()
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_currentUser.PhotoPath))
-                {
-                    string fullPath = Path.Combine(
-                        AppDomain.CurrentDomain.BaseDirectory,
-                        _currentUser.PhotoPath);
-
-                    if (File.Exists(fullPath))
-                        return Image.FromFile(fullPath);
-                }
-
-                string defaultPath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "Photos/default.png");
-
-                if (File.Exists(defaultPath))
-                    return Image.FromFile(defaultPath);
-
-                return SystemIcons.Application.ToBitmap();
-            }
-            catch
-            {
-                return SystemIcons.Application.ToBitmap();
-            }
-        }
-
+        // ================= BUTTONS =================
         private Button AddMenuButton(string text, string iconPath, Action onClick)
         {
             var btn = new Button

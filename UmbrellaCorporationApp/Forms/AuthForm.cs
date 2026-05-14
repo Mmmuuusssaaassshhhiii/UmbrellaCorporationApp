@@ -22,6 +22,7 @@ namespace UmbrellaCorporationApp
     public partial class AuthForm : Form
     {
         private readonly UmbrellaDbContext _context;
+        private Button closeBtn = null!;
 
         private TextBox loginBox;
         private TextBox passwordBox;
@@ -39,6 +40,8 @@ namespace UmbrellaCorporationApp
                      ControlStyles.AllPaintingInWmPaint |
                      ControlStyles.UserPaint,
                      true);
+            
+            InitializeCloseButton();
 
             UpdateStyles();
 
@@ -51,6 +54,52 @@ namespace UmbrellaCorporationApp
                 _fadeCts = new CancellationTokenSource();
                 _ = FadeIn(_fadeCts.Token);
             };
+        }
+        
+        private void InitializeCloseButton()
+        {
+            closeBtn = new Button
+            {
+                Text = "X",
+
+                Width = 60,
+                Height = 60,
+
+                FlatStyle = FlatStyle.Flat,
+
+                Font = new Font("Exo 2", 18, FontStyle.Bold),
+
+                ForeColor = Color.White,
+
+                Cursor = Cursors.Hand,
+
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+
+            closeBtn.FlatAppearance.BorderSize = 0;
+
+            closeBtn.Location = new Point(
+                ClientSize.Width - closeBtn.Width - 25,
+                25);
+
+            closeBtn.MouseEnter += (s, e) =>
+            {
+                closeBtn.ForeColor = Color.Gray;
+            };
+
+            closeBtn.MouseLeave += (s, e) =>
+            {
+                closeBtn.ForeColor = Color.White;
+            };
+
+            closeBtn.Click += (s, e) =>
+            {
+                Application.Exit();
+            };
+
+            Controls.Add(closeBtn);
+
+            closeBtn.BringToFront();
         }
 
         private async Task FadeIn(CancellationToken token)
@@ -369,12 +418,6 @@ namespace UmbrellaCorporationApp
             string fullName = loginBox.Text.Trim();
             string badgeId = passwordBox.Text.Trim();
 
-            if (fullName == "Username" || badgeId == "Badge-ID")
-            {
-                MessageBox.Show("Заполни поля");
-                return;
-            }
-
             var employee = _context.Employees
                 .FirstOrDefault(x =>
                     x.FullName.ToLower() == fullName.ToLower() &&
@@ -385,22 +428,24 @@ namespace UmbrellaCorporationApp
                 MessageBox.Show("Неверные данные");
                 return;
             }
-            
+
             employee.IsOnline = true;
             employee.LastSeen = DateTime.Now;
-
             _context.SaveChanges();
 
             var main = new MainScreen(_context, employee);
 
-            main.Show();
-
-            Hide();
-
-            main.FormClosed += (s, args) =>
+            main.FormClosed += (_, _) =>
             {
-                Close();
+                Application.Exit();
             };
+
+            main.Show();
+            
+            BeginInvoke(new Action(() =>
+            {
+                Hide();   // или Close(), но безопаснее Hide + Exit control в MainScreen
+            }));
         }
     }
 }
