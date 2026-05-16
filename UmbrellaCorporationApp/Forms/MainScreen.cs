@@ -207,7 +207,10 @@ namespace UmbrellaCorporationApp
             _reportsButton = AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", "Report.png",
                 () => LoadScreen(new ReportsControl(_context, _currentUser)));
 
-            AddMenuButton("ОБРАЗЦЫ И ВИРУСЫ", "Virus.png",
+            AddMenuButton("ВИРУСЫ", "Virus.png",
+                () => LoadScreen(new VirusControl(_context)));
+            
+            AddMenuButton("ОБРАЗЦЫ", "Virus.png",
                 () => LoadScreen(new VirusControl(_context)));
 
             AddMenuButton("ИСПЫТУЕМЫЕ", "Zombie.png",
@@ -231,11 +234,8 @@ namespace UmbrellaCorporationApp
             AddMenuButton("ИССЛЕДОВАНИЕ МУТАЦИЙ", "Mutation.png",
                 () => LoadScreen(new MutationsControl(_context, _currentUser)));
 
-            AddMenuButton("УТРАТЫ И ЛИКВИДАЦИИ", "Loss.png",
-                () => LoadScreen(new LossControl()));
-
             AddMenuButton("РАЗРАБОТКИ", "Development.png",
-                () => LoadScreen(new DevelopmentsControl()));
+                () => LoadScreen(new DevelopmentsControl(_context)));
 
             AddMenuButton("СООБЩЕНИЯ", "Message.png",
                 () => LoadScreen(new MessageControl(_context, _currentUser)));

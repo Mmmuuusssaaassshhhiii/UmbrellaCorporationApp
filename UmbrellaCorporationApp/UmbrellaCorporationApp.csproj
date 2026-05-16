@@ -70,6 +70,12 @@
       <Compile Update="Forms\ProtocolEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\VirusEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Forms\DevelopmentEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
