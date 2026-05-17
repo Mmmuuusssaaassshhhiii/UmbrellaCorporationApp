@@ -4,18 +4,21 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorporationApp.UI;
 
 public class DevelopmentsControl : UserControl
 {
     private readonly UmbrellaDbContext _context;
+    private readonly Employee _currentUser;
 
     private readonly DataGridView grid;
 
-    public DevelopmentsControl(UmbrellaDbContext context)
+    public DevelopmentsControl(UmbrellaDbContext context, Employee currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
 
         Dock = DockStyle.Fill;
         BackColor = Color.FromArgb(30, 0, 0);
@@ -27,22 +30,25 @@ public class DevelopmentsControl : UserControl
             BackColor = Color.FromArgb(25, 0, 0)
         };
 
-        var addBtn = CreateButton("ДОБАВИТЬ РАЗРАБОТКУ");
-
-        addBtn.Location = new Point(15, 15);
-
-        addBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form =
-                new DevelopmentEditorForm(_context);
+            var addBtn = CreateButton("ДОБАВИТЬ РАЗРАБОТКУ");
 
-            if (form.ShowDialog() == DialogResult.OK)
+            addBtn.Location = new Point(15, 15);
+
+            addBtn.Click += (s, e) =>
             {
-                LoadData();
-            }
-        };
+                var form =
+                    new DevelopmentEditorForm(_context);
 
-        topPanel.Controls.Add(addBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadData();
+                }
+            };
+
+            topPanel.Controls.Add(addBtn);
+        }
 
         grid = CreateGrid();
         grid.Dock = DockStyle.Fill; 
@@ -57,7 +63,9 @@ public class DevelopmentsControl : UserControl
 
     private void InitializeContextMenu()
     {
-        var menu = new ContextMenuStrip();
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
+        {
+            var menu = new ContextMenuStrip();
 
         menu.Items.Add(
             "Редактировать",
@@ -137,6 +145,7 @@ public class DevelopmentsControl : UserControl
                 menu.Show(grid, e.Location);
             }
         };
+        }
     }
 
     private void LoadData()

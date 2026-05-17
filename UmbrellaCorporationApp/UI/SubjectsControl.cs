@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 using UmbrellaCorporationApp.Forms;
 
 namespace UmbrellaCorporationApp.UI;
@@ -11,12 +12,14 @@ namespace UmbrellaCorporationApp.UI;
 public class SubjectsControl : UserControl
 {
     private readonly UmbrellaDbContext _context;
+    private readonly Employee _currentUser;
 
     private FlowLayoutPanel container = null!;
 
-    public SubjectsControl(UmbrellaDbContext context)
+    public SubjectsControl(UmbrellaDbContext context, Employee currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
 
         InitializeUI();
     }
@@ -36,21 +39,24 @@ public class SubjectsControl : UserControl
 
         Controls.Add(topPanel);
 
-        var createBtn = CreateTopButton("ДОБАВИТЬ ИСПЫТУЕМОГО");
-
-        createBtn.Location = new Point(10, 15);
-
-        createBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new SubjectEditorForm(_context);
+            var createBtn = CreateTopButton("ДОБАВИТЬ ИСПЫТУЕМОГО");
 
-            if (form.ShowDialog() == DialogResult.OK)
+            createBtn.Location = new Point(10, 15);
+
+            createBtn.Click += (s, e) =>
             {
-                LoadSubjects();
-            }
-        };
+                var form = new SubjectEditorForm(_context);
 
-        topPanel.Controls.Add(createBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadSubjects();
+                }
+            };
+
+            topPanel.Controls.Add(createBtn);
+        }
 
         container = new FlowLayoutPanel
         {
@@ -95,48 +101,46 @@ public class SubjectsControl : UserControl
             }
 
             // ===== CONTEXT MENU =====
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Открыть", null, (s, e) =>
+            if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
             {
-                OpenSubject();
-            });
+                var menu = new ContextMenuStrip();
 
-            menu.Items.Add("Редактировать", null, (s, e) =>
-            {
-                var editor = new SubjectEditorForm(
-                    _context,
-                    subject);
-
-                if (editor.ShowDialog() == DialogResult.OK)
+                menu.Items.Add("Редактировать", null, (s, e) =>
                 {
-                    LoadSubjects();
-                }
-            });
+                    var editor = new SubjectEditorForm(
+                        _context,
+                        subject);
 
-            menu.Items.Add("Удалить", null, (s, e) =>
-            {
-                var result = MessageBox.Show(
-                    "Удалить испытуемого?",
-                    "Подтверждение",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
+                    if (editor.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadSubjects();
+                    }
+                });
 
-                if (result == DialogResult.Yes)
+                menu.Items.Add("Удалить", null, (s, e) =>
                 {
-                    _context.TestSubjects.Remove(subject);
+                    var result = MessageBox.Show(
+                        "Удалить испытуемого?",
+                        "Подтверждение",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
 
-                    _context.SaveChanges();
+                    if (result == DialogResult.Yes)
+                    {
+                        _context.TestSubjects.Remove(subject);
 
-                    LoadSubjects();
+                        _context.SaveChanges();
+
+                        LoadSubjects();
+                    }
+                });
+
+                card.ContextMenuStrip = menu;
+
+                foreach (Control control in card.Controls)
+                {
+                    control.ContextMenuStrip = menu;
                 }
-            });
-
-            card.ContextMenuStrip = menu;
-
-            foreach (Control control in card.Controls)
-            {
-                control.ContextMenuStrip = menu;
             }
 
             container.Controls.Add(card);

@@ -14,10 +14,12 @@ public class SampleControl : UserControl
     private readonly UmbrellaDbContext _context;
 
     private readonly DataGridView grid;
+    private readonly Employee _currentUser;
 
-    public SampleControl(UmbrellaDbContext context)
+    public SampleControl(UmbrellaDbContext context, Employee currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
 
         Dock = DockStyle.Fill;
         BackColor = Color.FromArgb(30, 0, 0);
@@ -29,20 +31,23 @@ public class SampleControl : UserControl
             BackColor = Color.FromArgb(25, 0, 0)
         };
 
-        var addBtn = CreateButton("ДОБАВИТЬ ОБРАЗЕЦ");
-        addBtn.Location = new Point(15, 15);
-
-        addBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new SampleEditorForm(_context);
+            var addBtn = CreateButton("ДОБАВИТЬ ОБРАЗЕЦ");
+            addBtn.Location = new Point(15, 15);
 
-            if (form.ShowDialog() == DialogResult.OK)
+            addBtn.Click += (s, e) =>
             {
-                LoadData();
-            }
-        };
+                var form = new SampleEditorForm(_context);
 
-        topPanel.Controls.Add(addBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadData();
+                }
+            };
+
+            topPanel.Controls.Add(addBtn);
+        }
 
         grid = CreateGrid();
         grid.Dock = DockStyle.Fill; 
@@ -190,7 +195,9 @@ public class SampleControl : UserControl
 
     private void InitializeContextMenu()
     {
-        var menu = new ContextMenuStrip();
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
+        {
+            var menu = new ContextMenuStrip();
 
         menu.Items.Add(
             "Редактировать",
@@ -293,6 +300,7 @@ public class SampleControl : UserControl
                     e.Location);
             }
         };
+        }
     }
 
     private Button CreateButton(

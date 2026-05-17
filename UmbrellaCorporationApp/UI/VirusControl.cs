@@ -11,12 +11,14 @@ namespace UmbrellaCorporationApp.UI;
 public class VirusControl : UserControl
 {
     private readonly UmbrellaDbContext _context;
+    private readonly Employee _currentUser;
 
     private readonly DataGridView grid;
 
-    public VirusControl(UmbrellaDbContext context)
+    public VirusControl(UmbrellaDbContext context, Employee currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
 
         Dock = DockStyle.Fill;
         BackColor = Color.FromArgb(30, 0, 0);
@@ -28,18 +30,21 @@ public class VirusControl : UserControl
             BackColor = Color.FromArgb(25, 0, 0)
         };
 
-        var addBtn = CreateButton("ДОБАВИТЬ ВИРУС");
-        addBtn.Location = new Point(15, 15);
-
-        addBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new VirusEditorForm(_context);
+            var addBtn = CreateButton("ДОБАВИТЬ ВИРУС");
+            addBtn.Location = new Point(15, 15);
 
-            if (form.ShowDialog() == DialogResult.OK)
-                LoadData();
-        };
+            addBtn.Click += (s, e) =>
+            {
+                var form = new VirusEditorForm(_context);
 
-        topPanel.Controls.Add(addBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                    LoadData();
+            };
+
+            topPanel.Controls.Add(addBtn);
+        }
 
         grid = CreateGrid();
         grid.Dock = DockStyle.Fill; 
@@ -184,7 +189,9 @@ public class VirusControl : UserControl
 
     private void InitializeContextMenu()
     {
-        var menu = new ContextMenuStrip();
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
+        {
+            var menu = new ContextMenuStrip();
 
         menu.Items.Add(
             "Редактировать",
@@ -287,6 +294,7 @@ public class VirusControl : UserControl
                     e.Location);
             }
         };
+        }
     }
 
     private Button CreateButton(

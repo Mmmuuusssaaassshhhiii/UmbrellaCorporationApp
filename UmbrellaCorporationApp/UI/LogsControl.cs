@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorporationApp.UI;
 
@@ -41,24 +42,27 @@ public class LogsControl : UserControl
 
         Controls.Add(topPanel);
 
-        var createBtn = CreateTopButton("СОЗДАТЬ ЗАПИСЬ");
-
-        createBtn.Location = new Point(10, 15);
-
-        createBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new IncidentEditorForm(
-                _context,
-                _currentUser);
+            var createBtn = CreateTopButton("СОЗДАТЬ ЗАПИСЬ");
 
-            if (form.ShowDialog() == DialogResult.OK)
+            createBtn.Location = new Point(10, 15);
+
+            createBtn.Click += (s, e) =>
             {
-                LoadLogs();
-            }
-        };
+                var form = new IncidentEditorForm(
+                    _context,
+                    _currentUser);
 
-        topPanel.Controls.Add(createBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadLogs();
+                }
+            };
 
+            topPanel.Controls.Add(createBtn);
+        }
+        
         container = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
@@ -85,55 +89,58 @@ public class LogsControl : UserControl
         {
             var card = new IncidentCard(log);
 
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Редактировать", null, (s, e) =>
+            if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
             {
-                if (log.ReportedById != _currentUser.Id)
+                var menu = new ContextMenuStrip();
+
+                menu.Items.Add("Редактировать", null, (s, e) =>
                 {
-                    MessageBox.Show(
-                        "Можно редактировать только свои записи");
+                    if (log.ReportedById != _currentUser.Id)
+                    {
+                        MessageBox.Show(
+                            "Можно редактировать только свои записи");
 
-                    return;
-                }
+                        return;
+                    }
 
-                var editor = new IncidentEditorForm(
-                    _context,
-                    _currentUser,
-                    log);
+                    var editor = new IncidentEditorForm(
+                        _context,
+                        _currentUser,
+                        log);
 
-                if (editor.ShowDialog() == DialogResult.OK)
+                    if (editor.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadLogs();
+                    }
+                });
+
+                menu.Items.Add("Удалить", null, (s, e) =>
                 {
-                    LoadLogs();
-                }
-            });
+                    if (log.ReportedById != _currentUser.Id)
+                    {
+                        MessageBox.Show(
+                            "Можно удалять только свои записи");
 
-            menu.Items.Add("Удалить", null, (s, e) =>
-            {
-                if (log.ReportedById != _currentUser.Id)
-                {
-                    MessageBox.Show(
-                        "Можно удалять только свои записи");
+                        return;
+                    }
 
-                    return;
-                }
+                    var result = MessageBox.Show(
+                        "Удалить запись?",
+                        "Подтверждение",
+                        MessageBoxButtons.YesNo);
 
-                var result = MessageBox.Show(
-                    "Удалить запись?",
-                    "Подтверждение",
-                    MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        _context.IncidentLogs.Remove(log);
 
-                if (result == DialogResult.Yes)
-                {
-                    _context.IncidentLogs.Remove(log);
+                        _context.SaveChanges();
 
-                    _context.SaveChanges();
+                        LoadLogs();
+                    }
+                });
 
-                    LoadLogs();
-                }
-            });
-
-            card.ContextMenuStrip = menu;
+                card.ContextMenuStrip = menu;
+            }
 
             container.Controls.Add(card);
         }

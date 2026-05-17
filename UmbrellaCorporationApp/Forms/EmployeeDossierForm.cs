@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using UmbrellaCorp.Helpers;
 using UmbrellaCorp.Models;
 
 namespace UmbrellaCorporationApp.UI
@@ -107,7 +108,7 @@ namespace UmbrellaCorporationApp.UI
                 Text =
                     $"Отдел: {emp.Department}\n" +
                     $"Должность: {emp.Position}\n" +
-                    $"Уровень Доступа: {emp.ClearanceLevel}\n" +
+                    $"{ClearanceHelper.GetName(emp.ClearanceLevel)}\n" +
                     $"Статус: {emp.Status}\n" +
                     $"Дата найма: {emp.HireDate:dd.MM.yyyy}" +
                     (emp.TerminationDate.HasValue

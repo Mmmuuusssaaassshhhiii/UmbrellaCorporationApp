@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 using UmbrellaCorporationApp.Forms;
 using UmbrellaCorporationApp.UI;
 
@@ -40,20 +41,23 @@ public class FilesControl : UserControl
 
         Controls.Add(topPanel);
 
-        var createBtn = CreateTopButton("СОЗДАТЬ ФАЙЛ");
-        createBtn.Location = new Point(10, 15);
-
-        createBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new FileEditorForm(_context);
+            var createBtn = CreateTopButton("СОЗДАТЬ ФАЙЛ");
+            createBtn.Location = new Point(10, 15);
 
-            if (form.ShowDialog() == DialogResult.OK)
+            createBtn.Click += (s, e) =>
             {
-                LoadFiles();
-            }
-        };
+                var form = new FileEditorForm(_context);
 
-        topPanel.Controls.Add(createBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadFiles();
+                }
+            };
+
+            topPanel.Controls.Add(createBtn);
+        }
 
         container = new FlowLayoutPanel
         {
@@ -81,51 +85,49 @@ public class FilesControl : UserControl
         {
             var card = new FileCard(file);
 
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Открыть", null, (s, e) =>
+            if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
             {
-                new FileViewerForm(file).ShowDialog();
-            });
-
-            menu.Items.Add("Редактировать", null, (s, e) =>
-            {
-                if (file.AuthorId != _currentUser.Id)
+                var menu = new ContextMenuStrip();
+                
+                menu.Items.Add("Редактировать", null, (s, e) =>
                 {
-                    MessageBox.Show("Можно редактировать только свои файлы");
-                    return;
-                }
+                    if (file.AuthorId != _currentUser.Id)
+                    {
+                        MessageBox.Show("Можно редактировать только свои файлы");
+                        return;
+                    }
 
-                var editor = new FileEditorForm(_context);
+                    var editor = new FileEditorForm(_context);
 
-                if (editor.ShowDialog() == DialogResult.OK)
+                    if (editor.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadFiles();
+                    }
+                });
+
+                menu.Items.Add("Удалить", null, (s, e) =>
                 {
-                    LoadFiles();
-                }
-            });
+                    if (file.AuthorId != _currentUser.Id)
+                    {
+                        MessageBox.Show("Можно удалять только свои файлы");
+                        return;
+                    }
 
-            menu.Items.Add("Удалить", null, (s, e) =>
-            {
-                if (file.AuthorId != _currentUser.Id)
-                {
-                    MessageBox.Show("Можно удалять только свои файлы");
-                    return;
-                }
+                    var result = MessageBox.Show(
+                        "Удалить файл?",
+                        "Подтверждение",
+                        MessageBoxButtons.YesNo);
 
-                var result = MessageBox.Show(
-                    "Удалить файл?",
-                    "Подтверждение",
-                    MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        _context.ClassifiedFiles.Remove(file);
+                        _context.SaveChanges();
+                        LoadFiles();
+                    }
+                });
 
-                if (result == DialogResult.Yes)
-                {
-                    _context.ClassifiedFiles.Remove(file);
-                    _context.SaveChanges();
-                    LoadFiles();
-                }
-            });
-
-            card.ContextMenuStrip = menu;
+                card.ContextMenuStrip = menu;
+            }
 
             container.Controls.Add(card);
         }

@@ -41,6 +41,10 @@ namespace UmbrellaCorp.Data
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Status)
                 .HasConversion<string>();
+            
+            modelBuilder.Entity<Employee>()
+                .Property(e => e.ClearanceLevel)
+                .HasConversion<string>();
 
             modelBuilder.Entity<TestSubject>()
                 .Property(t => t.Status)

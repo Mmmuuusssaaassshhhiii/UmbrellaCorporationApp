@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorporationApp.UI;
 
@@ -41,23 +42,26 @@ public class MutationsControl : UserControl
 
         Controls.Add(topPanel);
 
-        var createBtn = CreateTopButton("ДОБАВИТЬ МУТАЦИЮ");
-
-        createBtn.Location = new Point(10, 15);
-
-        createBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new MutationEditorForm(
-                _context,
-                _currentUser);
+            var createBtn = CreateTopButton("ДОБАВИТЬ МУТАЦИЮ");
 
-            if (form.ShowDialog() == DialogResult.OK)
+            createBtn.Location = new Point(10, 15);
+
+            createBtn.Click += (s, e) =>
             {
-                LoadMutations();
-            }
-        };
+                var form = new MutationEditorForm(
+                    _context,
+                    _currentUser);
 
-        topPanel.Controls.Add(createBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadMutations();
+                }
+            };
+
+            topPanel.Controls.Add(createBtn);
+        }
 
         container = new FlowLayoutPanel
         {
@@ -86,40 +90,43 @@ public class MutationsControl : UserControl
         {
             var card = new MutationCard(mutation);
 
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Редактировать", null, (s, e) =>
+            if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
             {
-                var editor = new MutationEditorForm(
-                    _context,
-                    _currentUser,
-                    mutation);
+                var menu = new ContextMenuStrip();
 
-                if (editor.ShowDialog() == DialogResult.OK)
+                menu.Items.Add("Редактировать", null, (s, e) =>
                 {
-                    LoadMutations();
-                }
-            });
+                    var editor = new MutationEditorForm(
+                        _context,
+                        _currentUser,
+                        mutation);
 
-            menu.Items.Add("Удалить", null, (s, e) =>
-            {
-                var result = MessageBox.Show(
-                    "Удалить запись?",
-                    "Подтверждение",
-                    MessageBoxButtons.YesNo);
+                    if (editor.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadMutations();
+                    }
+                });
 
-                if (result == DialogResult.Yes)
+                menu.Items.Add("Удалить", null, (s, e) =>
                 {
-                    _context.Mutations.Remove(mutation);
+                    var result = MessageBox.Show(
+                        "Удалить запись?",
+                        "Подтверждение",
+                        MessageBoxButtons.YesNo);
 
-                    _context.SaveChanges();
+                    if (result == DialogResult.Yes)
+                    {
+                        _context.Mutations.Remove(mutation);
 
-                    LoadMutations();
-                }
-            });
+                        _context.SaveChanges();
 
-            card.ContextMenuStrip = menu;
+                        LoadMutations();
+                    }
+                });
 
+                card.ContextMenuStrip = menu;
+            }
+            
             container.Controls.Add(card);
         }
     }

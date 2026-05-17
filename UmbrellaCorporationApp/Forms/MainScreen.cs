@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
+using UmbrellaCorp.Helpers;
 using UmbrellaCorp.Models;
 using UmbrellaCorporationApp.UI;
 
@@ -63,8 +64,7 @@ namespace UmbrellaCorporationApp
                 _context.SaveChanges();
             }
             catch { }
-
-            // КРИТИЧНО: закрываем форму БЕЗ вложенных FormClosed событий
+            
             BeginInvoke(new Action(() =>
             {
                 Hide();
@@ -255,7 +255,7 @@ namespace UmbrellaCorporationApp
             var access = new Label
             {
                 Text =
-                    $"Уровень доступа: {_currentUser.ClearanceLevel}",
+                    $"{ClearanceHelper.GetName(_currentUser.ClearanceLevel)}",
 
                 ForeColor = Color.Gray,
 
@@ -293,13 +293,13 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new ReportsControl(_context, _currentUser)));
 
             AddMenuButton("ВИРУСЫ", "Virus.png",
-                () => LoadScreen(new VirusControl(_context)));
+                () => LoadScreen(new VirusControl(_context, _currentUser)));
             
             AddMenuButton("ОБРАЗЦЫ", "Sample.png",
-                () => LoadScreen(new SampleControl(_context)));
+                () => LoadScreen(new SampleControl(_context, _currentUser)));
 
             AddMenuButton("ИСПЫТУЕМЫЕ", "Zombie.png",
-                () => LoadScreen(new SubjectsControl(_context)));
+                () => LoadScreen(new SubjectsControl(_context, _currentUser)));
 
             AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "Protocol.png",
                 () => LoadScreen(new ProtocolsControl(_context, _currentUser)));
@@ -317,7 +317,7 @@ namespace UmbrellaCorporationApp
                 () => LoadScreen(new MutationsControl(_context, _currentUser)));
 
             AddMenuButton("РАЗРАБОТКИ", "Bio.png",
-                () => LoadScreen(new DevelopmentsControl(_context)));
+                () => LoadScreen(new DevelopmentsControl(_context, _currentUser)));
 
             AddMenuButton("СООБЩЕНИЯ", "Message.png",
                 () => LoadScreen(new MessageControl(_context, _currentUser)));

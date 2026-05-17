@@ -19,7 +19,7 @@ namespace UmbrellaCorp.Models
         [MaxLength(100)]
         public string Position { get; set; } = string.Empty;
 
-        public int ClearanceLevel { get; set; }
+        public ClearanceLevel ClearanceLevel { get; set; }
 
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Alive;
 

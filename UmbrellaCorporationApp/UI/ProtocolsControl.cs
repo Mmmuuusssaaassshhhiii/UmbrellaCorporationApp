@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
+using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorporationApp.UI;
 
@@ -40,23 +41,26 @@ public class ProtocolsControl : UserControl
 
         Controls.Add(topPanel);
 
-        var createBtn = CreateTopButton("СОЗДАТЬ ПРОТОКОЛ");
-
-        createBtn.Location = new Point(10, 15);
-
-        createBtn.Click += (s, e) =>
+        if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
         {
-            var form = new ProtocolEditorForm(
-                _context,
-                _currentUser);
+            var createBtn = CreateTopButton("СОЗДАТЬ ПРОТОКОЛ");
 
-            if (form.ShowDialog() == DialogResult.OK)
+            createBtn.Location = new Point(10, 15);
+
+            createBtn.Click += (s, e) =>
             {
-                LoadProtocols();
-            }
-        };
+                var form = new ProtocolEditorForm(
+                    _context,
+                    _currentUser);
 
-        topPanel.Controls.Add(createBtn);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProtocols();
+                }
+            };
+
+            topPanel.Controls.Add(createBtn);   
+        }
 
         container = new FlowLayoutPanel
         {
@@ -83,39 +87,42 @@ public class ProtocolsControl : UserControl
         {
             var card = new ProtocolCard(protocol);
 
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Редактировать", null, (s, e) =>
+            if (_currentUser.ClearanceLevel == ClearanceLevel.Level10)
             {
-                var editor = new ProtocolEditorForm(
-                    _context,
-                    _currentUser,
-                    protocol);
+                var menu = new ContextMenuStrip();
 
-                if (editor.ShowDialog() == DialogResult.OK)
+                menu.Items.Add("Редактировать", null, (s, e) =>
                 {
-                    LoadProtocols();
-                }
-            });
+                    var editor = new ProtocolEditorForm(
+                        _context,
+                        _currentUser,
+                        protocol);
 
-            menu.Items.Add("Удалить", null, (s, e) =>
-            {
-                var result = MessageBox.Show(
-                    "Удалить протокол?",
-                    "Подтверждение",
-                    MessageBoxButtons.YesNo);
+                    if (editor.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadProtocols();
+                    }
+                });
 
-                if (result == DialogResult.Yes)
+                menu.Items.Add("Удалить", null, (s, e) =>
                 {
-                    _context.EmergencyProtocols.Remove(protocol);
+                    var result = MessageBox.Show(
+                        "Удалить протокол?",
+                        "Подтверждение",
+                        MessageBoxButtons.YesNo);
 
-                    _context.SaveChanges();
+                    if (result == DialogResult.Yes)
+                    {
+                        _context.EmergencyProtocols.Remove(protocol);
 
-                    LoadProtocols();
-                }
-            });
+                        _context.SaveChanges();
 
-            card.ContextMenuStrip = menu;
+                        LoadProtocols();
+                    }
+                });
+
+                card.ContextMenuStrip = menu;
+            }
 
             container.Controls.Add(card);
         }
