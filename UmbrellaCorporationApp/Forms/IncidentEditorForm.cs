@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
@@ -9,6 +10,16 @@ namespace UmbrellaCorporationApp.UI;
 
 public class IncidentEditorForm : Form
 {
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(
+        IntPtr hWnd,
+        int Msg,
+        int wParam,
+        int lParam);
+    
     private readonly UmbrellaDbContext _context;
 
     private readonly Employee _currentUser;
@@ -45,108 +56,234 @@ public class IncidentEditorForm : Form
     }
 
     private void InitializeUI()
+{
+    Size = new Size(900, 760);
+
+    StartPosition = FormStartPosition.CenterScreen;
+
+    BackColor = Color.FromArgb(20, 0, 0);
+
+    FormBorderStyle = FormBorderStyle.None;
+
+    Padding = new Padding(1);
+
+    MaximizeBox = false;
+
+    // ================= TOP BAR =================
+
+    var topBar = new Panel
     {
-        Text = "Редактор инцидента";
+        Dock = DockStyle.Top,
+        Height = 42,
+        BackColor = Color.FromArgb(55, 0, 0)
+    };
 
-        Size = new Size(900, 720);
+    Controls.Add(topBar);
 
-        StartPosition = FormStartPosition.CenterScreen;
-
-        BackColor = Color.FromArgb(20, 0, 0);
-
-        FormBorderStyle = FormBorderStyle.FixedSingle;
-
-        typeBox = new TextBox
+    topBar.MouseDown += (s, e) =>
+    {
+        if (e.Button == MouseButtons.Left)
         {
-            Location = new Point(30, 30),
-            Width = 820,
-            Font = new Font("Exo 2", 13)
-        };
+            ReleaseCapture();
 
-        Controls.Add(typeBox);
+            SendMessage(
+                Handle,
+                0xA1,
+                0x2,
+                0);
+        }
+    };
 
-        locationBox = new TextBox
-        {
-            Location = new Point(30, 90),
-            Width = 820,
-            Font = new Font("Exo 2", 13)
-        };
+    // ================= CLOSE BUTTON =================
 
-        Controls.Add(locationBox);
+    var closeBtn = new Button
+    {
+        Text = "X",
+        Dock = DockStyle.Right,
+        Width = 55,
+        FlatStyle = FlatStyle.Flat,
+        BackColor = Color.FromArgb(55, 0, 0),
+        ForeColor = Color.White,
+        Font = new Font("Exo 2", 11, FontStyle.Bold),
+        Cursor = Cursors.Hand
+    };
 
-        severityBox = new ComboBox
-        {
-            Location = new Point(30, 150),
+    closeBtn.FlatAppearance.BorderSize = 0;
 
-            Width = 250,
+    closeBtn.MouseEnter += (s, e) =>
+    {
+        closeBtn.BackColor = Color.DarkRed;
+    };
 
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+    closeBtn.MouseLeave += (s, e) =>
+    {
+        closeBtn.BackColor = Color.FromArgb(55, 0, 0);
+    };
 
-        severityBox.Items.AddRange(
-            Enum.GetNames(typeof(IncidentSeverity)));
+    closeBtn.Click += (s, e) =>
+    {
+        Close();
+    };
 
-        severityBox.SelectedIndex = 0;
+    topBar.Controls.Add(closeBtn);
 
-        Controls.Add(severityBox);
+    // ================= TITLE =================
 
-        resolvedBox = new CheckBox
-        {
-            Text = "Инцидент устранен",
+    var title = new Label
+    {
+        Text = _log == null
+            ? "НОВОЕ ПРОИСШЕСТВИЕ"
+            : "РЕДАКТИРОВАНИЕ ПРОИСШЕСТВИЯ",
 
-            ForeColor = Color.White,
+        Font = new Font(
+            "Exo 2",
+            22,
+            FontStyle.Bold),
 
-            BackColor = Color.Transparent,
+        ForeColor = Color.White,
 
-            Font = new Font("Exo 2", 11),
+        AutoSize = true,
 
-            Location = new Point(320, 150),
+        Location = new Point(30, 70)
+    };
 
-            Width = 250
-        };
+    Controls.Add(title);
 
-        Controls.Add(resolvedBox);
+    // ================= TYPE =================
 
-        descriptionBox = new RichTextBox
-        {
-            Location = new Point(30, 220),
+    Controls.Add(CreateLabel(
+        "ТИП ПРОИСШЕСТВИЯ",
+        30,
+        140));
 
-            Size = new Size(820, 380),
+    typeBox = CreateTextBox(
+        30,
+        170);
 
-            Font = new Font("Exo 2", 12),
+    Controls.Add(typeBox);
 
-            BackColor = Color.FromArgb(40, 0, 0),
+    // ================= LOCATION =================
 
-            ForeColor = Color.White
-        };
+    Controls.Add(CreateLabel(
+        "МЕСТО ПРОИСШЕСТВИЯ",
+        30,
+        240));
 
-        Controls.Add(descriptionBox);
+    locationBox = CreateTextBox(
+        30,
+        270);
 
-        var saveBtn = new Button
-        {
-            Text = "СОХРАНИТЬ",
+    Controls.Add(locationBox);
 
-            Width = 220,
+    // ================= SEVERITY =================
 
-            Height = 45,
+    Controls.Add(CreateLabel(
+        "ТЯЖЕСТЬ",
+        30,
+        340));
 
-            Location = new Point(630, 620),
+    severityBox = CreateComboBox(
+        30,
+        370);
 
-            FlatStyle = FlatStyle.Flat,
+    severityBox.Items.AddRange(
+        Enum.GetNames(
+            typeof(IncidentSeverity)));
 
-            BackColor = Color.FromArgb(120, 0, 0),
+    severityBox.SelectedIndex = 0;
 
-            ForeColor = Color.White,
+    Controls.Add(severityBox);
 
-            Font = new Font("Exo 2", 10, FontStyle.Bold)
-        };
+    // ================= RESOLVED =================
 
-        saveBtn.FlatAppearance.BorderSize = 0;
+    resolvedBox = new CheckBox
+    {
+        Text = "Инцидент устранен",
 
-        saveBtn.Click += SaveLog;
+        Location = new Point(30, 440),
 
-        Controls.Add(saveBtn);
-    }
+        AutoSize = true,
+
+        ForeColor = Color.White,
+
+        BackColor = Color.Transparent,
+
+        Font = new Font(
+            "Exo 2",
+            11,
+            FontStyle.Bold)
+    };
+
+    Controls.Add(resolvedBox);
+
+    // ================= DESCRIPTION =================
+
+    Controls.Add(CreateLabel(
+        "ОПИСАНИЕ",
+        30,
+        490));
+
+    descriptionBox = new RichTextBox
+    {
+        Location = new Point(30, 520),
+
+        Size = new Size(820, 140),
+
+        Font = new Font("Consolas", 12),
+
+        BackColor = Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle = BorderStyle.FixedSingle
+    };
+
+    Controls.Add(descriptionBox);
+
+    // ================= SAVE BUTTON =================
+
+    var saveBtn = new Button
+    {
+        Text = "СОХРАНИТЬ",
+
+        Width = 220,
+
+        Height = 45,
+
+        Location = new Point(630, 680),
+
+        FlatStyle = FlatStyle.Flat,
+
+        BackColor = Color.FromArgb(120, 0, 0),
+
+        ForeColor = Color.White,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold),
+
+        Cursor = Cursors.Hand
+    };
+
+    saveBtn.FlatAppearance.BorderSize = 0;
+
+    saveBtn.MouseEnter += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(180, 0, 0);
+    };
+
+    saveBtn.MouseLeave += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(120, 0, 0);
+    };
+
+    saveBtn.Click += SaveLog;
+
+    Controls.Add(saveBtn);
+}
 
     private void LoadLog()
     {
@@ -221,5 +358,71 @@ public class IncidentEditorForm : Form
         DialogResult = DialogResult.OK;
 
         Close();
+    }
+    
+    private TextBox CreateTextBox(
+        int x,
+        int y)
+    {
+        return new TextBox
+        {
+            Location = new Point(x, y),
+
+            Width = 820,
+
+            Height = 40,
+
+            Font = new Font("Exo 2", 13),
+
+            BackColor = Color.FromArgb(40, 0, 0),
+
+            ForeColor = Color.White,
+
+            BorderStyle = BorderStyle.FixedSingle
+        };
+    }
+
+    private ComboBox CreateComboBox(
+        int x,
+        int y)
+    {
+        return new ComboBox
+        {
+            Location = new Point(x, y),
+
+            Width = 820,
+
+            Height = 40,
+
+            Font = new Font("Exo 2", 13),
+
+            BackColor = Color.FromArgb(40, 0, 0),
+
+            ForeColor = Color.White,
+
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+    }
+    
+    private Label CreateLabel(
+        string text,
+        int x,
+        int y)
+    {
+        return new Label
+        {
+            Text = text,
+
+            Location = new Point(x, y),
+
+            AutoSize = true,
+
+            ForeColor = Color.Gainsboro,
+
+            Font = new Font(
+                "Exo 2",
+                10,
+                FontStyle.Bold)
+        };
     }
 }

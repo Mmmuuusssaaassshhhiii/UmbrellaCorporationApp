@@ -8,11 +8,13 @@ public class SubjectCard : Panel
 {
     public SubjectCard(TestSubject subject)
     {
-        Width = 420;
+        Width = 500;
 
-        Height = 180;
+        Height = 300;
 
-        Margin = new Padding(15);
+        Margin = new Padding(60);
+        
+        Padding = new Padding(15);
 
         BackColor = Color.FromArgb(45, 0, 0);
 
@@ -40,52 +42,49 @@ public class SubjectCard : Panel
 
         Controls.Add(code);
 
+        int startY = 70;
+        int gap = 40;
+
         var virus = CreateInfo(
-            $"Вирус: {subject.VirusId}",
-            65);
+            $"Вирус: {subject.Virus?.Name ?? "НЕТ"}",
+            startY);
 
         Controls.Add(virus);
-        
+
         var status = CreateInfo(
             $"Статус: {subject.Status}",
-            95);
+            startY + gap);
 
         Controls.Add(status);
 
         var location = CreateInfo(
             $"Местонахождение: {subject.Location}",
-            95);
-        
+            startY + gap * 2);
+
         Controls.Add(location);
-        
+
         var date = CreateInfo(
-            $"Дата появления: {subject.AcquiredDate}",
-            95);
-        
+            $"Дата появления: {subject.AcquiredDate:dd.MM.yyyy}",
+            startY + gap * 3);
+
         Controls.Add(date);
-        
+
         var notes = CreateInfo(
             $"Заметки: {subject.Notes}",
-            95);
-        
-        Controls.Add(date);
+            startY + gap * 4);
+
+        Controls.Add(notes);
     }
 
-    private Label CreateInfo(
-        string text,
-        int top)
+    private Label CreateInfo(string text, int y)
     {
         return new Label
         {
             Text = text,
-
-            Font = new Font("Exo2", 11),
-
+            Font = new Font("Exo 2", 11),
             ForeColor = Color.Gainsboro,
-
             AutoSize = true,
-
-            Location = new Point(22, top)
+            Location = new Point(20, y)
         };
     }
 }

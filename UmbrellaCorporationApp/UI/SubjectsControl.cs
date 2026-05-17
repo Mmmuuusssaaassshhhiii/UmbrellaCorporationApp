@@ -57,7 +57,8 @@ public class SubjectsControl : UserControl
             Dock = DockStyle.Fill,
             AutoScroll = true,
             Padding = new Padding(20),
-            BackColor = Color.FromArgb(30, 0, 0)
+            BackColor = Color.FromArgb(30, 0, 0),
+            WrapContents = true
         };
 
         Controls.Add(container);
@@ -70,20 +71,35 @@ public class SubjectsControl : UserControl
         container.Controls.Clear();
 
         var subjects = _context.TestSubjects
-            .OrderByDescending(x => x.VirusId)
+            .Include(x => x.Virus)
+            .OrderByDescending(x => x.AcquiredDate)
             .ToList();
 
         foreach (var subject in subjects)
         {
             var card = new SubjectCard(subject);
 
-            var menu = new ContextMenuStrip();
-
-            menu.Items.Add("Открыть", null, (s, e) =>
+            void OpenSubject()
             {
                 var viewer = new SubjectViewForm(subject);
 
                 viewer.ShowDialog();
+            }
+
+            // ===== DOUBLE CLICK =====
+            card.DoubleClick += (s, e) => OpenSubject();
+
+            foreach (Control control in card.Controls)
+            {
+                control.DoubleClick += (s, e) => OpenSubject();
+            }
+
+            // ===== CONTEXT MENU =====
+            var menu = new ContextMenuStrip();
+
+            menu.Items.Add("Открыть", null, (s, e) =>
+            {
+                OpenSubject();
             });
 
             menu.Items.Add("Редактировать", null, (s, e) =>
@@ -103,7 +119,8 @@ public class SubjectsControl : UserControl
                 var result = MessageBox.Show(
                     "Удалить испытуемого?",
                     "Подтверждение",
-                    MessageBoxButtons.YesNo);
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
 
                 if (result == DialogResult.Yes)
                 {
@@ -116,6 +133,11 @@ public class SubjectsControl : UserControl
             });
 
             card.ContextMenuStrip = menu;
+
+            foreach (Control control in card.Controls)
+            {
+                control.ContextMenuStrip = menu;
+            }
 
             container.Controls.Add(card);
         }

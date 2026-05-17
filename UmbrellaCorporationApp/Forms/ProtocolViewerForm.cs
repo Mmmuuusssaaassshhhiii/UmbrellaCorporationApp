@@ -7,6 +7,7 @@ namespace UmbrellaCorporationApp.UI;
 public class ProtocolViewerForm : Form
 {
     private Panel sheet = null!;
+    private Button closeBtn = null!;
 
     public ProtocolViewerForm(EmergencyProtocol protocol)
     {
@@ -151,26 +152,39 @@ public class ProtocolViewerForm : Form
 
     private void InitializeCloseButton()
     {
-        var closeBtn = new Button
+        closeBtn = new Button
         {
             Text = "X",
 
             Width = 60,
-
             Height = 60,
 
             FlatStyle = FlatStyle.Flat,
 
-            ForeColor = Color.White,
-
             Font = new Font("Exo 2", 18, FontStyle.Bold),
 
-            Location = new Point(
-                ClientSize.Width - 90,
-                20)
+            ForeColor = Color.White,
+
+            Cursor = Cursors.Hand,
+
+            Anchor = AnchorStyles.Top | AnchorStyles.Right
         };
 
         closeBtn.FlatAppearance.BorderSize = 0;
+
+        closeBtn.Location = new Point(
+            ClientSize.Width - closeBtn.Width - 25,
+            25);
+
+        closeBtn.MouseEnter += (s, e) =>
+        {
+            closeBtn.ForeColor = Color.Gray;
+        };
+
+        closeBtn.MouseLeave += (s, e) =>
+        {
+            closeBtn.ForeColor = Color.White;
+        };
 
         closeBtn.Click += (s, e) => Close();
 

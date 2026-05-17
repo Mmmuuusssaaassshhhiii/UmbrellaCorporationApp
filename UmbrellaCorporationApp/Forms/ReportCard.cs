@@ -24,17 +24,11 @@ public class ReportCard : Panel
     public ReportCard(LabReport report)
     {
         _report = report;
-
         Size = new Size(150, _collapsedHeight);
-
         Margin = new Padding(60);
-
         Cursor = Cursors.Hand;
-
         BorderStyle = BorderStyle.None;
-
         DoubleBuffered = true;
-
         Padding = new Padding(15);
 
         BackColor = Color.Transparent;
@@ -42,61 +36,40 @@ public class ReportCard : Panel
         var icon = new PictureBox
         {
             Dock = DockStyle.Top,
-
             Height = 90,
-
             SizeMode = PictureBoxSizeMode.Zoom,
-
             BackColor = Color.Transparent,
-
             BorderStyle = BorderStyle.None,
-
             Image = LoadTransparentImage()
         };
 
         _title = new Label
         {
             Text = report.Title,
-
             Dock = DockStyle.Fill,
-
             ForeColor = Color.White,
-
             Font = new Font("Exo 2", 10, FontStyle.Bold),
-
             TextAlign = ContentAlignment.TopCenter,
-
             BackColor = Color.Transparent,
-
             AutoEllipsis = true
         };
 
         Controls.Add(_title);
-
         Controls.Add(icon);
 
         Click += ToggleExpand;
-
         icon.Click += ToggleExpand;
-
         _title.Click += ToggleExpand;
 
         DoubleClick += OpenReport;
-
         icon.DoubleClick += OpenReport;
-
         _title.DoubleClick += OpenReport;
 
         MouseEnter += OnHover;
-
         MouseLeave += OnLeave;
-
         icon.MouseEnter += OnHover;
-
         icon.MouseLeave += OnLeave;
-
         _title.MouseEnter += OnHover;
-
         _title.MouseLeave += OnLeave;
 
         ParentChanged += (_, _) =>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
@@ -9,6 +10,16 @@ namespace UmbrellaCorporationApp.UI;
 
 public class ReportEditorForm : Form
 {
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(
+        IntPtr hWnd,
+        int Msg,
+        int wParam,
+        int lParam);
+    
     private readonly UmbrellaDbContext _context;
 
     private readonly Employee _currentUser;
@@ -41,80 +52,276 @@ public class ReportEditorForm : Form
     }
 
     private void InitializeUI()
+{
+    Size = new Size(900, 760);
+
+    StartPosition = FormStartPosition.CenterScreen;
+
+    FormBorderStyle = FormBorderStyle.None;
+
+    BackColor = Color.FromArgb(20, 0, 0);
+
+    Padding = new Padding(1);
+
+    MaximizeBox = false;
+
+    // ================= TOP BAR =================
+
+    var topBar = new Panel
     {
-        Text = "Редактор отчета";
+        Dock = DockStyle.Top,
+        Height = 42,
+        BackColor = Color.FromArgb(55, 0, 0)
+    };
 
-        Size = new Size(900, 700);
+    Controls.Add(topBar);
 
-        StartPosition = FormStartPosition.CenterScreen;
-
-        BackColor = Color.FromArgb(20, 0, 0);
-
-        FormBorderStyle = FormBorderStyle.FixedSingle;
-
-        titleBox = new TextBox
+    topBar.MouseDown += (s, e) =>
+    {
+        if (e.Button == MouseButtons.Left)
         {
-            Location = new Point(30, 30),
+            ReleaseCapture();
 
-            Width = 820,
+            SendMessage(
+                Handle,
+                0xA1,
+                0x2,
+                0);
+        }
+    };
 
-            Font = new Font("Exo 2", 14)
-        };
+    // ================= CLOSE BUTTON =================
 
-        Controls.Add(titleBox);
+    var closeBtn = new Button
+    {
+        Text = "X",
+        Dock = DockStyle.Right,
+        Width = 55,
+        FlatStyle = FlatStyle.Flat,
+        BackColor = Color.FromArgb(55, 0, 0),
+        ForeColor = Color.White,
+        Font = new Font("Exo 2", 11, FontStyle.Bold),
+        Cursor = Cursors.Hand
+    };
 
-        levelBox = new ComboBox
-        {
-            Location = new Point(30, 80),
+    closeBtn.FlatAppearance.BorderSize = 0;
 
-            Width = 250,
+    closeBtn.MouseEnter += (s, e) =>
+    {
+        closeBtn.BackColor = Color.DarkRed;
+    };
 
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+    closeBtn.MouseLeave += (s, e) =>
+    {
+        closeBtn.BackColor = Color.FromArgb(55, 0, 0);
+    };
 
-        levelBox.Items.AddRange(
-            Enum.GetNames(typeof(ConfidentialityLevel)));
+    closeBtn.Click += (s, e) =>
+    {
+        Close();
+    };
 
-        levelBox.SelectedIndex = 0;
+    topBar.Controls.Add(closeBtn);
 
-        Controls.Add(levelBox);
+    // ================= TITLE =================
 
-        contentBox = new RichTextBox
-        {
-            Location = new Point(30, 130),
+    var title = new Label
+    {
+        Text = _report == null
+            ? "НОВЫЙ ОТЧЁТ"
+            : "РЕДАКТИРОВАНИЕ ОТЧЁТА",
 
-            Size = new Size(820, 450),
+        Font = new Font(
+            "Exo 2",
+            22,
+            FontStyle.Bold),
 
-            Font = new Font("Consolas", 12)
-        };
+        ForeColor = Color.White,
 
-        Controls.Add(contentBox);
+        AutoSize = true,
 
-        var saveBtn = new Button
-        {
-            Text = "СОХРАНИТЬ",
+        Location = new Point(30, 70)
+    };
 
-            Width = 220,
+    Controls.Add(title);
 
-            Height = 45,
+    // ================= REPORT TITLE =================
 
-            Location = new Point(630, 600),
+    var reportTitleLabel = CreateLabel(
+        "НАЗВАНИЕ ОТЧЁТА",
+        30,
+        140);
 
-            FlatStyle = FlatStyle.Flat,
+    Controls.Add(reportTitleLabel);
 
-            BackColor = Color.FromArgb(120, 0, 0),
+    titleBox = CreateTextBox(
+        30,
+        170);
 
-            ForeColor = Color.White,
+    Controls.Add(titleBox);
 
-            Font = new Font("Exo 2", 10, FontStyle.Bold)
-        };
+    // ================= CONFIDENTIAL LEVEL =================
 
-        saveBtn.FlatAppearance.BorderSize = 0;
+    var levelLabel = CreateLabel(
+        "УРОВЕНЬ СЕКРЕТНОСТИ",
+        30,
+        240);
 
-        saveBtn.Click += SaveReport;
+    Controls.Add(levelLabel);
 
-        Controls.Add(saveBtn);
-    }
+    levelBox = CreateComboBox(
+        30,
+        270);
+
+    levelBox.Items.AddRange(
+        Enum.GetNames(
+            typeof(ConfidentialityLevel)));
+
+    levelBox.SelectedIndex = 0;
+
+    Controls.Add(levelBox);
+
+    // ================= CONTENT =================
+
+    var contentLabel = CreateLabel(
+        "СОДЕРЖИМОЕ ОТЧЁТА",
+        30,
+        340);
+
+    Controls.Add(contentLabel);
+
+    contentBox = new RichTextBox
+    {
+        Location = new Point(30, 370),
+
+        Size = new Size(820, 250),
+
+        Font = new Font("Exo 2", 12),
+
+        BackColor = Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle = BorderStyle.FixedSingle
+    };
+
+    Controls.Add(contentBox);
+
+    // ================= SAVE BUTTON =================
+
+    InitializeSaveButton();
+}
+
+private Label CreateLabel(
+    string text,
+    int x,
+    int y)
+{
+    return new Label
+    {
+        Text = text,
+
+        Location = new Point(x, y),
+
+        AutoSize = true,
+
+        ForeColor = Color.Gainsboro,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold)
+    };
+}
+
+private TextBox CreateTextBox(
+    int x,
+    int y)
+{
+    return new TextBox
+    {
+        Location = new Point(x, y),
+
+        Width = 820,
+
+        Height = 40,
+
+        Font = new Font("Exo 2", 13),
+
+        BackColor = Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle = BorderStyle.FixedSingle
+    };
+}
+
+private ComboBox CreateComboBox(
+    int x,
+    int y)
+{
+    return new ComboBox
+    {
+        Location = new Point(x, y),
+
+        Width = 820,
+
+        Height = 40,
+
+        Font = new Font("Exo 2", 13),
+
+        BackColor = Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        DropDownStyle = ComboBoxStyle.DropDownList
+    };
+}
+
+private void InitializeSaveButton()
+{
+    var saveBtn = new Button
+    {
+        Text = "СОХРАНИТЬ",
+
+        Width = 220,
+
+        Height = 45,
+
+        Location = new Point(630, 660),
+
+        FlatStyle = FlatStyle.Flat,
+
+        BackColor = Color.FromArgb(120, 0, 0),
+
+        ForeColor = Color.White,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold),
+
+        Cursor = Cursors.Hand
+    };
+
+    saveBtn.FlatAppearance.BorderSize = 0;
+
+    saveBtn.MouseEnter += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(180, 0, 0);
+    };
+
+    saveBtn.MouseLeave += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(120, 0, 0);
+    };
+
+    saveBtn.Click += SaveReport;
+
+    Controls.Add(saveBtn);
+}
 
     private void LoadReport()
     {

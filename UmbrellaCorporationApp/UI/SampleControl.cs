@@ -2,19 +2,20 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
 using UmbrellaCorp.Models.Enums;
 
 namespace UmbrellaCorporationApp.UI;
 
-public class VirusControl : UserControl
+public class SampleControl : UserControl
 {
     private readonly UmbrellaDbContext _context;
 
     private readonly DataGridView grid;
 
-    public VirusControl(UmbrellaDbContext context)
+    public SampleControl(UmbrellaDbContext context)
     {
         _context = context;
 
@@ -28,26 +29,29 @@ public class VirusControl : UserControl
             BackColor = Color.FromArgb(25, 0, 0)
         };
 
-        var addBtn = CreateButton("ДОБАВИТЬ ВИРУС");
+        var addBtn = CreateButton("ДОБАВИТЬ ОБРАЗЕЦ");
         addBtn.Location = new Point(15, 15);
 
         addBtn.Click += (s, e) =>
         {
-            var form = new VirusEditorForm(_context);
+            var form = new SampleEditorForm(_context);
 
             if (form.ShowDialog() == DialogResult.OK)
+            {
                 LoadData();
+            }
         };
 
         topPanel.Controls.Add(addBtn);
 
         grid = CreateGrid();
         grid.Dock = DockStyle.Fill; 
-        
-        Controls.Add(grid);      
-        Controls.Add(topPanel);  
+
+        Controls.Add(grid);
+        Controls.Add(topPanel);
 
         InitializeContextMenu();
+
         LoadData();
     }
 
@@ -135,24 +139,26 @@ public class VirusControl : UserControl
 
     private void LoadData()
     {
-        var data = _context.Viruses
+        var data = _context.Samples
+            .Include(x => x.Virus)
+            .Include(x => x.ResponsibleScientist)
             .Select(x => new
             {
                 Id = x.Id,
 
-                Название = x.Name,
+                Образец = x.Virus != null ? x.Virus.Name : "НЕТ",
 
-                Угроза = x.DangerLevel,
+                ОтветственноеЛицо = x.ResponsibleScientist != null
+                    ? x.ResponsibleScientist.FullName
+                    : "НЕТ",
 
-                Инкубация =
-                    x.IncubationHours,
+                Местонахождение = x.StorageLocation,
 
-                Симптомы = x.Symptoms,
+                ДатаСоздания = x.CreatedAt,
 
-                Антидот =
-                    x.AntidoteExists
-                        ? "ДА"
-                        : "НЕТ"
+                Заметки = x.Notes,
+
+                Уничтожен = x.IsDestroyed ? "ДА" : "НЕТ"
             })
             .ToList();
 
@@ -199,18 +205,18 @@ public class VirusControl : UserControl
                         .Cells["Id"]
                         .Value);
 
-                var virus =
-                    _context.Viruses
+                var sample =
+                    _context.Samples
                         .FirstOrDefault(
                             x => x.Id == id);
 
-                if (virus == null)
+                if (sample == null)
                     return;
 
                 var form =
-                    new VirusEditorForm(
+                    new SampleEditorForm(
                         _context,
-                        virus);
+                        sample);
 
                 if (form.ShowDialog() ==
                     DialogResult.OK)
@@ -232,17 +238,17 @@ public class VirusControl : UserControl
                         .Cells["Id"]
                         .Value);
 
-                var virus =
-                    _context.Viruses
+                var sample =
+                    _context.Samples
                         .FirstOrDefault(
                             x => x.Id == id);
 
-                if (virus == null)
+                if (sample == null)
                     return;
 
                 var result =
                     MessageBox.Show(
-                        "Удалить вирус?",
+                        "Удалить образец?",
                         "Подтверждение",
                         MessageBoxButtons
                             .YesNo);
@@ -250,8 +256,8 @@ public class VirusControl : UserControl
                 if (result ==
                     DialogResult.Yes)
                 {
-                    _context.Viruses
-                        .Remove(virus);
+                    _context.Samples
+                        .Remove(sample);
 
                     _context.SaveChanges();
 
@@ -297,10 +303,10 @@ public class VirusControl : UserControl
             Text = text,
 
             Width = 220,
-
-            Height = 40,
             
             Cursor =  Cursors.Hand,
+
+            Height = 40,
 
             FlatStyle =
                 FlatStyle.Flat,

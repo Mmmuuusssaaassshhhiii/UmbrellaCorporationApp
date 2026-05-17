@@ -176,32 +176,117 @@ namespace UmbrellaCorporationApp
             };
             header.Controls.Add(logo);
 
+            // ================= USER PANEL =================
+
             var userPanel = new Panel
             {
-                Size = new Size(500, 90),
-                Location = new Point(sidebar.Width + 40, 5)
+                Size = new Size(650, 90),
+                Location = new Point(sidebar.Width + 40, 5),
+                BackColor = Color.Transparent
             };
+
             header.Controls.Add(userPanel);
+
+
+// ================= AVATAR =================
+
+            var avatar = new PictureBox
+            {
+                Size = new Size(70, 70),
+                Location = new Point(10, 10),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                BackColor = Color.FromArgb(40, 0, 0)
+            };
+
+
+// ===== SAFE IMAGE LOAD =====
+
+            if (!string.IsNullOrWhiteSpace(_currentUser.PhotoPath)
+                && File.Exists(_currentUser.PhotoPath))
+            {
+                try
+                {
+                    using var fs = new FileStream(
+                        _currentUser.PhotoPath,
+                        FileMode.Open,
+                        FileAccess.Read);
+
+                    avatar.Image = Image.FromStream(fs);
+                }
+                catch
+                {
+                    avatar.Image = null;
+                }
+            }
+
+
+// ===== ROUND AVATAR =====
+
+            GraphicsPath path = new GraphicsPath();
+
+            path.AddEllipse(
+                0,
+                0,
+                avatar.Width - 1,
+                avatar.Height - 1);
+
+            avatar.Region = new Region(path);
+
+            userPanel.Controls.Add(avatar);
 
             var userName = new Label
             {
                 Text = _currentUser.FullName,
+
                 ForeColor = Color.White,
-                Font = new Font("Exo 2", 15, FontStyle.Bold),
-                Location = new Point(95, 18),
+
+                Font = new Font(
+                    "Exo 2",
+                    15,
+                    FontStyle.Bold),
+
+                Location = new Point(95, 10),
+
                 AutoSize = true
             };
+
             userPanel.Controls.Add(userName);
 
             var access = new Label
             {
-                Text = $"Уровень доступа: {_currentUser.ClearanceLevel}",
+                Text =
+                    $"Уровень доступа: {_currentUser.ClearanceLevel}",
+
                 ForeColor = Color.Gray,
-                Font = new Font("Exo 2", 10),
-                Location = new Point(95, 48),
+
+                Font = new Font(
+                    "Exo 2",
+                    10),
+
+                Location = new Point(95, 38),
+
                 AutoSize = true
             };
+
             userPanel.Controls.Add(access);
+
+            var online = new Label
+            {
+                Text = "● ONLINE",
+
+                ForeColor = Color.LimeGreen,
+
+                Font = new Font(
+                    "Exo 2",
+                    10,
+                    FontStyle.Bold),
+
+                Location = new Point(95, 58),
+
+                AutoSize = true
+            };
+
+            userPanel.Controls.Add(online);
 
             // ================= MENU =================
             _reportsButton = AddMenuButton("ЛАБОРАТОРНЫЕ ОТЧЁТЫ", "Report.png",
@@ -210,14 +295,11 @@ namespace UmbrellaCorporationApp
             AddMenuButton("ВИРУСЫ", "Virus.png",
                 () => LoadScreen(new VirusControl(_context)));
             
-            AddMenuButton("ОБРАЗЦЫ", "Virus.png",
-                () => LoadScreen(new VirusControl(_context)));
+            AddMenuButton("ОБРАЗЦЫ", "Sample.png",
+                () => LoadScreen(new SampleControl(_context)));
 
             AddMenuButton("ИСПЫТУЕМЫЕ", "Zombie.png",
                 () => LoadScreen(new SubjectsControl(_context)));
-
-            AddMenuButton("СТАТИСТИКА И АНАЛИЗ", "Statistic.png",
-                () => LoadScreen(new StatisticsControl()));
 
             AddMenuButton("АВАРИЙНЫЕ ПРОТОКОЛЫ", "Protocol.png",
                 () => LoadScreen(new ProtocolsControl(_context, _currentUser)));
@@ -234,7 +316,7 @@ namespace UmbrellaCorporationApp
             AddMenuButton("ИССЛЕДОВАНИЕ МУТАЦИЙ", "Mutation.png",
                 () => LoadScreen(new MutationsControl(_context, _currentUser)));
 
-            AddMenuButton("РАЗРАБОТКИ", "Development.png",
+            AddMenuButton("РАЗРАБОТКИ", "Bio.png",
                 () => LoadScreen(new DevelopmentsControl(_context)));
 
             AddMenuButton("СООБЩЕНИЯ", "Message.png",

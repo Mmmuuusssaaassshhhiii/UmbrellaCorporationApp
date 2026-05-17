@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
@@ -8,6 +9,16 @@ namespace UmbrellaCorporationApp.UI;
 
 public class ProtocolEditorForm : Form
 {
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(
+        IntPtr hWnd,
+        int Msg,
+        int wParam,
+        int lParam);
+    
     private readonly UmbrellaDbContext _context;
 
     private readonly Employee _currentUser;
@@ -42,94 +53,290 @@ public class ProtocolEditorForm : Form
     }
 
     private void InitializeUI()
+{
+    Size = new Size(900, 760);
+
+    StartPosition =
+        FormStartPosition.CenterScreen;
+
+    BackColor =
+        Color.FromArgb(20, 0, 0);
+
+    FormBorderStyle =
+        FormBorderStyle.None;
+
+    Padding =
+        new Padding(1);
+
+    MaximizeBox = false;
+
+    // ================= TOP BAR =================
+
+    var topBar = new Panel
     {
-        Text = "Редактор протоколов";
+        Dock = DockStyle.Top,
 
-        Size = new Size(900, 700);
+        Height = 42,
 
-        StartPosition = FormStartPosition.CenterScreen;
+        BackColor =
+            Color.FromArgb(55, 0, 0)
+    };
 
-        BackColor = Color.FromArgb(20, 0, 0);
+    Controls.Add(topBar);
 
-        codeBox = new TextBox
+    topBar.MouseDown += (s, e) =>
+    {
+        if (e.Button == MouseButtons.Left)
         {
-            Location = new Point(30, 30),
+            ReleaseCapture();
 
-            Width = 300,
+            SendMessage(
+                Handle,
+                0xA1,
+                0x2,
+                0);
+        }
+    };
 
-            Font = new Font("Exo 2", 13)
-        };
+    // ================= CLOSE BUTTON =================
 
-        Controls.Add(codeBox);
+    var closeBtn = new Button
+    {
+        Text = "X",
 
-        nameBox = new TextBox
-        {
-            Location = new Point(360, 30),
+        Dock = DockStyle.Right,
 
-            Width = 490,
+        Width = 55,
 
-            Font = new Font("Exo 2", 13)
-        };
+        FlatStyle = FlatStyle.Flat,
 
-        Controls.Add(nameBox);
+        BackColor =
+            Color.FromArgb(55, 0, 0),
 
-        activeBox = new CheckBox
-        {
-            Text = "Протокол активен",
+        ForeColor = Color.White,
 
-            ForeColor = Color.White,
+        Font = new Font(
+            "Exo 2",
+            11,
+            FontStyle.Bold),
 
-            BackColor = Color.Transparent,
+        Cursor = Cursors.Hand
+    };
 
-            Font = new Font("Exo 2", 11),
+    closeBtn.FlatAppearance.BorderSize = 0;
 
-            Location = new Point(30, 80),
+    closeBtn.MouseEnter += (s, e) =>
+    {
+        closeBtn.BackColor = Color.DarkRed;
+    };
 
-            Width = 250
-        };
+    closeBtn.MouseLeave += (s, e) =>
+    {
+        closeBtn.BackColor =
+            Color.FromArgb(55, 0, 0);
+    };
 
-        Controls.Add(activeBox);
+    closeBtn.Click += (s, e) =>
+    {
+        Close();
+    };
 
-        instructionsBox = new RichTextBox
-        {
-            Location = new Point(30, 130),
+    topBar.Controls.Add(closeBtn);
 
-            Size = new Size(820, 450),
+    // ================= TITLE =================
 
-            Font = new Font("Consolas", 12),
+    var title = new Label
+    {
+        Text = _protocol == null
+            ? "НОВЫЙ ПРОТОКОЛ"
+            : "РЕДАКТИРОВАНИЕ ПРОТОКОЛА",
 
-            BackColor = Color.FromArgb(40, 0, 0),
+        Font = new Font(
+            "Exo 2",
+            22,
+            FontStyle.Bold),
 
-            ForeColor = Color.White
-        };
+        ForeColor = Color.White,
 
-        Controls.Add(instructionsBox);
+        AutoSize = true,
 
-        var saveBtn = new Button
-        {
-            Text = "СОХРАНИТЬ",
+        Location = new Point(30, 70)
+    };
 
-            Width = 220,
+    Controls.Add(title);
 
-            Height = 45,
+    // ================= CODE =================
 
-            Location = new Point(630, 610),
+    Controls.Add(CreateLabel(
+        "КОД ПРОТОКОЛА",
+        30,
+        140));
 
-            FlatStyle = FlatStyle.Flat,
+    codeBox = CreateTextBox(
+        30,
+        170,
+        300);
 
-            BackColor = Color.FromArgb(120, 0, 0),
+    Controls.Add(codeBox);
 
-            ForeColor = Color.White,
+    // ================= NAME =================
 
-            Font = new Font("Exo 2", 10, FontStyle.Bold)
-        };
+    Controls.Add(CreateLabel(
+        "НАЗВАНИЕ ПРОТОКОЛА",
+        360,
+        140));
 
-        saveBtn.FlatAppearance.BorderSize = 0;
+    nameBox = CreateTextBox(
+        360,
+        170,
+        490);
 
-        saveBtn.Click += SaveProtocol;
+    Controls.Add(nameBox);
 
-        Controls.Add(saveBtn);
-    }
+    // ================= ACTIVE =================
+
+    activeBox = new CheckBox
+    {
+        Text = "Протокол активен",
+
+        ForeColor = Color.White,
+
+        BackColor = Color.Transparent,
+
+        Font = new Font(
+            "Exo 2",
+            11,
+            FontStyle.Bold),
+
+        Location = new Point(30, 240),
+
+        AutoSize = true
+    };
+
+    Controls.Add(activeBox);
+
+    // ================= INSTRUCTIONS =================
+
+    Controls.Add(CreateLabel(
+        "ИНСТРУКЦИИ",
+        30,
+        300));
+
+    instructionsBox = new RichTextBox
+    {
+        Location = new Point(30, 330),
+
+        Size = new Size(820, 280),
+
+        Font = new Font(
+            "Consolas",
+            12),
+
+        BackColor =
+            Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle =
+            BorderStyle.FixedSingle
+    };
+
+    Controls.Add(instructionsBox);
+
+    // ================= SAVE BUTTON =================
+
+    var saveBtn = new Button
+    {
+        Text = "СОХРАНИТЬ",
+
+        Width = 220,
+
+        Height = 45,
+
+        Location = new Point(630, 660),
+
+        FlatStyle = FlatStyle.Flat,
+
+        BackColor =
+            Color.FromArgb(120, 0, 0),
+
+        ForeColor = Color.White,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold),
+
+        Cursor = Cursors.Hand
+    };
+
+    saveBtn.FlatAppearance.BorderSize = 0;
+
+    saveBtn.MouseEnter += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(180, 0, 0);
+    };
+
+    saveBtn.MouseLeave += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(120, 0, 0);
+    };
+
+    saveBtn.Click += SaveProtocol;
+
+    Controls.Add(saveBtn);
+}
+
+private Label CreateLabel(
+    string text,
+    int x,
+    int y)
+{
+    return new Label
+    {
+        Text = text,
+
+        Location = new Point(x, y),
+
+        AutoSize = true,
+
+        ForeColor = Color.Gainsboro,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold)
+    };
+}
+
+private TextBox CreateTextBox(
+    int x,
+    int y,
+    int width)
+{
+    return new TextBox
+    {
+        Location = new Point(x, y),
+
+        Width = width,
+
+        Height = 40,
+
+        Font = new Font(
+            "Exo 2",
+            13),
+
+        BackColor =
+            Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle =
+            BorderStyle.FixedSingle
+    };
+}
 
     private void LoadProtocol()
     {

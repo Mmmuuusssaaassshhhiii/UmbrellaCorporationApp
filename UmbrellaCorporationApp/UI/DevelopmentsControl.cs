@@ -18,7 +18,6 @@ public class DevelopmentsControl : UserControl
         _context = context;
 
         Dock = DockStyle.Fill;
-
         BackColor = Color.FromArgb(30, 0, 0);
 
         var topPanel = new Panel
@@ -28,10 +27,7 @@ public class DevelopmentsControl : UserControl
             BackColor = Color.FromArgb(25, 0, 0)
         };
 
-        Controls.Add(topPanel);
-
-        var addBtn = CreateButton(
-            "ДОБАВИТЬ РАЗРАБОТКУ");
+        var addBtn = CreateButton("ДОБАВИТЬ РАЗРАБОТКУ");
 
         addBtn.Location = new Point(15, 15);
 
@@ -49,8 +45,10 @@ public class DevelopmentsControl : UserControl
         topPanel.Controls.Add(addBtn);
 
         grid = CreateGrid();
+        grid.Dock = DockStyle.Fill; 
 
         Controls.Add(grid);
+        Controls.Add(topPanel);
 
         InitializeContextMenu();
 
@@ -264,6 +262,8 @@ public class DevelopmentsControl : UserControl
             Text = text,
 
             Width = 250,
+            
+            Cursor =  Cursors.Hand,
 
             Height = 40,
 

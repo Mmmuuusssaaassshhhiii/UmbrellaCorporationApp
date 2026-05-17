@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
@@ -9,6 +10,16 @@ namespace UmbrellaCorporationApp.UI;
 
 public class MutationEditorForm : Form
 {
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(
+        IntPtr hWnd,
+        int Msg,
+        int wParam,
+        int lParam);
+    
     private readonly UmbrellaDbContext _context;
 
     private readonly Employee _currentUser;
@@ -41,89 +52,279 @@ public class MutationEditorForm : Form
     }
 
     private void InitializeUI()
+{
+    Size = new Size(900, 720);
+
+    StartPosition =
+        FormStartPosition.CenterScreen;
+
+    BackColor =
+        Color.FromArgb(20, 0, 0);
+
+    FormBorderStyle =
+        FormBorderStyle.None;
+
+    Padding =
+        new Padding(1);
+
+    MaximizeBox = false;
+
+    // ================= TOP BAR =================
+
+    var topBar = new Panel
     {
-        Text = "Редактор мутаций";
+        Dock = DockStyle.Top,
 
-        Size = new Size(900, 650);
+        Height = 42,
 
-        StartPosition = FormStartPosition.CenterScreen;
+        BackColor =
+            Color.FromArgb(55, 0, 0)
+    };
 
-        BackColor = Color.FromArgb(20, 0, 0);
+    Controls.Add(topBar);
 
-        subjectBox = new ComboBox
+    topBar.MouseDown += (s, e) =>
+    {
+        if (e.Button == MouseButtons.Left)
         {
-            Location = new Point(30, 30),
+            ReleaseCapture();
 
-            Width = 350,
+            SendMessage(
+                Handle,
+                0xA1,
+                0x2,
+                0);
+        }
+    };
 
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+    // ================= CLOSE BUTTON =================
 
-        subjectBox.DataSource = _context.TestSubjects.ToList();
+    var closeBtn = new Button
+    {
+        Text = "X",
 
-        subjectBox.DisplayMember = "Code";
+        Dock = DockStyle.Right,
 
-        subjectBox.ValueMember = "Id";
+        Width = 55,
 
-        Controls.Add(subjectBox);
+        FlatStyle = FlatStyle.Flat,
 
-        virusBox = new ComboBox
-        {
-            Location = new Point(430, 30),
+        BackColor =
+            Color.FromArgb(55, 0, 0),
 
-            Width = 350,
+        ForeColor = Color.White,
 
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+        Font = new Font(
+            "Exo 2",
+            11,
+            FontStyle.Bold),
 
-        virusBox.DataSource = _context.Viruses.ToList();
+        Cursor = Cursors.Hand
+    };
 
-        virusBox.DisplayMember = "Name";
+    closeBtn.FlatAppearance.BorderSize = 0;
 
-        virusBox.ValueMember = "Id";
+    closeBtn.MouseEnter += (s, e) =>
+    {
+        closeBtn.BackColor = Color.DarkRed;
+    };
 
-        Controls.Add(virusBox);
+    closeBtn.MouseLeave += (s, e) =>
+    {
+        closeBtn.BackColor =
+            Color.FromArgb(55, 0, 0);
+    };
 
-        descriptionBox = new RichTextBox
-        {
-            Location = new Point(30, 100),
+    closeBtn.Click += (s, e) =>
+    {
+        Close();
+    };
 
-            Size = new Size(820, 420),
+    topBar.Controls.Add(closeBtn);
 
-            Font = new Font("Exo 2", 12),
+    // ================= TITLE =================
 
-            BackColor = Color.FromArgb(40, 0, 0),
+    var title = new Label
+    {
+        Text = _mutation == null
+            ? "НОВАЯ МУТАЦИЯ"
+            : "РЕДАКТИРОВАНИЕ МУТАЦИИ",
 
-            ForeColor = Color.White
-        };
+        Font = new Font(
+            "Exo 2",
+            22,
+            FontStyle.Bold),
 
-        Controls.Add(descriptionBox);
+        ForeColor = Color.White,
 
-        var saveBtn = new Button
-        {
-            Text = "СОХРАНИТЬ",
+        AutoSize = true,
 
-            Width = 220,
+        Location = new Point(30, 70)
+    };
 
-            Height = 45,
+    Controls.Add(title);
 
-            Location = new Point(630, 550),
+    // ================= SUBJECT =================
 
-            FlatStyle = FlatStyle.Flat,
+    Controls.Add(CreateLabel(
+        "ИСПЫТУЕМЫЙ",
+        30,
+        140));
 
-            BackColor = Color.FromArgb(120, 0, 0),
+    subjectBox = CreateComboBox(
+        30,
+        170);
 
-            ForeColor = Color.White,
+    subjectBox.DataSource =
+        _context.TestSubjects.ToList();
 
-            Font = new Font("Exo 2", 10, FontStyle.Bold)
-        };
+    subjectBox.DisplayMember = "Code";
 
-        saveBtn.FlatAppearance.BorderSize = 0;
+    subjectBox.ValueMember = "Id";
 
-        saveBtn.Click += SaveMutation;
+    Controls.Add(subjectBox);
 
-        Controls.Add(saveBtn);
-    }
+    // ================= VIRUS =================
+
+    Controls.Add(CreateLabel(
+        "ВИРУС",
+        30,
+        240));
+
+    virusBox = CreateComboBox(
+        30,
+        270);
+
+    virusBox.DataSource =
+        _context.Viruses.ToList();
+
+    virusBox.DisplayMember = "Name";
+
+    virusBox.ValueMember = "Id";
+
+    Controls.Add(virusBox);
+
+    // ================= DESCRIPTION =================
+
+    Controls.Add(CreateLabel(
+        "ОПИСАНИЕ МУТАЦИИ",
+        30,
+        340));
+
+    descriptionBox = new RichTextBox
+    {
+        Location = new Point(30, 370),
+
+        Size = new Size(820, 220),
+
+        Font = new Font(
+            "Exo 2",
+            12),
+
+        BackColor =
+            Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        BorderStyle =
+            BorderStyle.FixedSingle
+    };
+
+    Controls.Add(descriptionBox);
+
+    // ================= SAVE BUTTON =================
+
+    var saveBtn = new Button
+    {
+        Text = "СОХРАНИТЬ",
+
+        Width = 220,
+
+        Height = 45,
+
+        Location = new Point(630, 630),
+
+        FlatStyle = FlatStyle.Flat,
+
+        BackColor =
+            Color.FromArgb(120, 0, 0),
+
+        ForeColor = Color.White,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold),
+
+        Cursor = Cursors.Hand
+    };
+
+    saveBtn.FlatAppearance.BorderSize = 0;
+
+    saveBtn.MouseEnter += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(180, 0, 0);
+    };
+
+    saveBtn.MouseLeave += (s, e) =>
+    {
+        saveBtn.BackColor =
+            Color.FromArgb(120, 0, 0);
+    };
+
+    saveBtn.Click += SaveMutation;
+
+    Controls.Add(saveBtn);
+}
+
+private Label CreateLabel(
+    string text,
+    int x,
+    int y)
+{
+    return new Label
+    {
+        Text = text,
+
+        Location = new Point(x, y),
+
+        AutoSize = true,
+
+        ForeColor = Color.Gainsboro,
+
+        Font = new Font(
+            "Exo 2",
+            10,
+            FontStyle.Bold)
+    };
+}
+
+private ComboBox CreateComboBox(
+    int x,
+    int y)
+{
+    return new ComboBox
+    {
+        Location = new Point(x, y),
+
+        Width = 820,
+
+        Height = 40,
+
+        Font = new Font(
+            "Exo 2",
+            13),
+
+        BackColor =
+            Color.FromArgb(40, 0, 0),
+
+        ForeColor = Color.White,
+
+        DropDownStyle =
+            ComboBoxStyle.DropDownList
+    };
+}
 
     private void LoadMutation()
     {

@@ -76,6 +76,9 @@
       <Compile Update="Forms\DevelopmentEditorForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="Forms\SampleEditorForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

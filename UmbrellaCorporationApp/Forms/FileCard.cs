@@ -24,12 +24,13 @@ public class FileCard : Panel
         _file = file;
 
         Size = new Size(150, _collapsedHeight);
-        Margin = new Padding(20);
+        Margin = new Padding(60);
         Cursor = Cursors.Hand;
         BorderStyle = BorderStyle.None;
         DoubleBuffered = true;
-        Padding = new Padding(10);
-        BackColor = Color.FromArgb(20, 20, 20);
+        Padding = new Padding(15);
+        
+        BackColor = Color.Transparent;
 
         var icon = new PictureBox
         {
@@ -37,6 +38,7 @@ public class FileCard : Panel
             Height = 90,
             SizeMode = PictureBoxSizeMode.Zoom,
             BackColor = Color.Transparent,
+            BorderStyle = BorderStyle.None,
             Image = LoadTransparentImage()
         };
 
@@ -68,6 +70,17 @@ public class FileCard : Panel
         icon.MouseLeave += OnLeave;
         _title.MouseEnter += OnHover;
         _title.MouseLeave += OnLeave;
+        
+        ParentChanged += (_, _) =>
+        {
+            if (Parent != null)
+            {
+                Parent.Click += (_, _) =>
+                {
+                    Collapse();
+                };
+            }
+        };
 
         Paint += DrawEffects;
     }

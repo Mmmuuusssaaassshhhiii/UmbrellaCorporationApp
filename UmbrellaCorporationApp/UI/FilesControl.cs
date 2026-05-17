@@ -45,7 +45,7 @@ public class FilesControl : UserControl
 
         createBtn.Click += (s, e) =>
         {
-            var form = new FileEditorForm();
+            var form = new FileEditorForm(_context);
 
             if (form.ShowDialog() == DialogResult.OK)
             {
@@ -96,7 +96,7 @@ public class FilesControl : UserControl
                     return;
                 }
 
-                var editor = new FileEditorForm();
+                var editor = new FileEditorForm(_context);
 
                 if (editor.ShowDialog() == DialogResult.OK)
                 {

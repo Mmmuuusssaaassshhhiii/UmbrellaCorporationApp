@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UmbrellaCorp.Data;
 using UmbrellaCorp.Models;
@@ -10,6 +11,16 @@ namespace UmbrellaCorporationApp.UI;
 
 public class DevelopmentEditorForm : Form
 {
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(
+        IntPtr hWnd,
+        int Msg,
+        int wParam,
+        int lParam);
+
     private readonly UmbrellaDbContext _context;
 
     private readonly Development? _development;
@@ -42,21 +53,79 @@ public class DevelopmentEditorForm : Form
         }
     }
 
-    private void InitializeUI()
+   private void InitializeUI()
     {
-        Text = _development == null
-            ? "Добавление разработки"
-            : "Редактирование разработки";
-
-        Size = new Size(700, 500);
+        Size = new Size(900, 760);
 
         StartPosition = FormStartPosition.CenterScreen;
 
+        FormBorderStyle = FormBorderStyle.None;
+
         BackColor = Color.FromArgb(20, 0, 0);
 
-        FormBorderStyle = FormBorderStyle.FixedSingle;
+        Padding = new Padding(1);
 
         MaximizeBox = false;
+
+        // ================= TOP BAR =================
+
+        var topBar = new Panel
+        {
+            Dock = DockStyle.Top,
+            Height = 42,
+            BackColor = Color.FromArgb(55, 0, 0)
+        };
+
+        Controls.Add(topBar);
+
+        topBar.MouseDown += (s, e) =>
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+
+                SendMessage(
+                    Handle,
+                    0xA1,
+                    0x2,
+                    0);
+            }
+        };
+
+        // ================= CLOSE BUTTON =================
+
+        var closeBtn = new Button
+        {
+            Text = "X",
+            Dock = DockStyle.Right,
+            Width = 55,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(55, 0, 0),
+            ForeColor = Color.White,
+            Font = new Font("Exo 2", 11, FontStyle.Bold),
+            Cursor = Cursors.Hand
+        };
+
+        closeBtn.FlatAppearance.BorderSize = 0;
+
+        closeBtn.MouseEnter += (s, e) =>
+        {
+            closeBtn.BackColor = Color.DarkRed;
+        };
+
+        closeBtn.MouseLeave += (s, e) =>
+        {
+            closeBtn.BackColor = Color.FromArgb(55, 0, 0);
+        };
+
+        closeBtn.Click += (s, e) =>
+        {
+            Close();
+        };
+
+        topBar.Controls.Add(closeBtn);
+
+        // ================= TITLE =================
 
         var title = new Label
         {
@@ -66,23 +135,41 @@ public class DevelopmentEditorForm : Form
 
             Font = new Font(
                 "Exo 2",
-                20,
+                22,
                 FontStyle.Bold),
 
             ForeColor = Color.White,
 
             AutoSize = true,
 
-            Location = new Point(30, 20)
+            Location = new Point(30, 70)
         };
 
         Controls.Add(title);
 
-        projectBox = CreateTextBox(30, 80);
+        // ================= PROJECT =================
+
+        Controls.Add(CreateLabel(
+            "НАЗВАНИЕ ПРОЕКТА",
+            30,
+            140));
+
+        projectBox = CreateTextBox(
+            30,
+            170);
 
         Controls.Add(projectBox);
 
-        virusBox = CreateComboBox(30, 140);
+        // ================= VIRUS =================
+
+        Controls.Add(CreateLabel(
+            "ВИРУС",
+            30,
+            240));
+
+        virusBox = CreateComboBox(
+            30,
+            270);
 
         virusBox.DataSource =
             _context.Viruses.ToList();
@@ -93,7 +180,16 @@ public class DevelopmentEditorForm : Form
 
         Controls.Add(virusBox);
 
-        scientistBox = CreateComboBox(30, 200);
+        // ================= SCIENTIST =================
+
+        Controls.Add(CreateLabel(
+            "ГЛАВНЫЙ УЧЕНЫЙ",
+            30,
+            340));
+
+        scientistBox = CreateComboBox(
+            30,
+            370);
 
         scientistBox.DataSource =
             _context.Employees.ToList();
@@ -104,37 +200,66 @@ public class DevelopmentEditorForm : Form
 
         Controls.Add(scientistBox);
 
-        statusBox = CreateComboBox(30, 260);
+        // ================= STATUS =================
+
+        Controls.Add(CreateLabel(
+            "СТАТУС",
+            30,
+            440));
+
+        statusBox = CreateComboBox(
+            30,
+            470);
 
         statusBox.Items.AddRange(
             Enum.GetNames(
                 typeof(DevelopmentStatus)));
 
-        statusBox.SelectedIndex = 0;
-
         Controls.Add(statusBox);
+
+        // ================= START DATE =================
+
+        Controls.Add(CreateLabel(
+            "ДАТА НАЧАЛА",
+            30,
+            540));
 
         startPicker = new DateTimePicker
         {
-            Location = new Point(30, 320),
+            Location = new Point(30, 570),
 
-            Width = 250,
+            Width = 350,
 
-            Font = new Font("Exo 2", 11)
+            Font = new Font("Exo 2", 11),
+
+            CalendarMonthBackground =
+                Color.FromArgb(40, 0, 0)
         };
 
         Controls.Add(startPicker);
 
+        // ================= END DATE =================
+
+        Controls.Add(CreateLabel(
+            "ДАТА ОКОНЧАНИЯ",
+            450,
+            540));
+
         endPicker = new DateTimePicker
         {
-            Location = new Point(320, 320),
+            Location = new Point(450, 570),
 
-            Width = 250,
+            Width = 350,
 
-            Font = new Font("Exo 2", 11)
+            Font = new Font("Exo 2", 11),
+
+            CalendarMonthBackground =
+                Color.FromArgb(40, 0, 0)
         };
 
         Controls.Add(endPicker);
+
+        // ================= SAVE BUTTON =================
 
         var saveBtn = new Button
         {
@@ -146,7 +271,7 @@ public class DevelopmentEditorForm : Form
 
             Height = 45,
 
-            Location = new Point(430, 390),
+            Location = new Point(630, 670),
 
             FlatStyle = FlatStyle.Flat,
 
@@ -157,14 +282,50 @@ public class DevelopmentEditorForm : Form
             Font = new Font(
                 "Exo 2",
                 10,
-                FontStyle.Bold)
+                FontStyle.Bold),
+
+            Cursor = Cursors.Hand
         };
 
         saveBtn.FlatAppearance.BorderSize = 0;
 
+        saveBtn.MouseEnter += (s, e) =>
+        {
+            saveBtn.BackColor =
+                Color.FromArgb(180, 0, 0);
+        };
+
+        saveBtn.MouseLeave += (s, e) =>
+        {
+            saveBtn.BackColor =
+                Color.FromArgb(120, 0, 0);
+        };
+
         saveBtn.Click += SaveDevelopment;
 
         Controls.Add(saveBtn);
+    }
+
+    private Label CreateLabel(
+        string text,
+        int x,
+        int y)
+    {
+        return new Label
+        {
+            Text = text,
+
+            Location = new Point(x, y),
+
+            AutoSize = true,
+
+            ForeColor = Color.Gainsboro,
+
+            Font = new Font(
+                "Exo 2",
+                10,
+                FontStyle.Bold)
+        };
     }
 
     private void LoadDevelopment()
@@ -270,9 +431,17 @@ public class DevelopmentEditorForm : Form
         {
             Location = new Point(x, y),
 
-            Width = 600,
+            Width = 820,
 
-            Font = new Font("Exo 2", 12)
+            Height = 40,
+
+            Font = new Font("Exo 2", 13),
+
+            BackColor = Color.FromArgb(40, 0, 0),
+
+            ForeColor = Color.White,
+
+            BorderStyle = BorderStyle.FixedSingle
         };
     }
 
@@ -284,12 +453,17 @@ public class DevelopmentEditorForm : Form
         {
             Location = new Point(x, y),
 
-            Width = 600,
+            Width = 820,
 
-            DropDownStyle =
-                ComboBoxStyle.DropDownList,
+            Height = 40,
 
-            Font = new Font("Exo 2", 11)
+            Font = new Font("Exo 2", 13),
+
+            BackColor = Color.FromArgb(40, 0, 0),
+
+            ForeColor = Color.White,
+
+            DropDownStyle = ComboBoxStyle.DropDownList
         };
     }
 }
